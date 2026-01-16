@@ -1,0 +1,14 @@
+{
+  "@noble/post-quantum": "^0.8.0",
+  "@stablelib/base64": "^1.0.1",
+  "@stablelib/utf8": "^1.0.2",
+  "base-x": "^4.0.0",
+  "multiformats": "^13.0.0",
+  "uuid": "^11.1.0",
+  "@ahryman40k/ts-fhir-types": "^4.0.39",
+  "@ungap/url-search-params": "^0.2.2",
+  "@universal-health-chain/uhc-common-utils-typescript": "^0.7.6",
+  "canonicalize": "^1.0.5",
+  "dicom-parser": "^1.8.7",
+  "sha1": "^1.1.1"
+}

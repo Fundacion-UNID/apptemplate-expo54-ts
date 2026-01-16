@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "apptemplate-expo54-ts",
-    "slug": "apptemplate-expo54-ts",
+    "name": "online.unid.app",
+    "slug": "online.unid.app",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",

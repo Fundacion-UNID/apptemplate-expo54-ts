@@ -1,3 +1,6 @@
+// Polyfill for setImmediate to support @react-native-firebase on web
+import 'setimmediate';
+
 import { registerRootComponent } from 'expo';
 
 import App from './App';

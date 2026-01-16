@@ -1,0 +1,296 @@
+// screens/organization/OrgLoginMemberScreen.js
+// Copyright 2026 Conéctate Soluciones y Aplicaciones SL under the Apache License, Version 2.0.
+
+import React, { useState, useMemo, useEffect } from 'react';
+import { View, ScrollView, Pressable, Dimensions } from 'react-native';
+import { useTranslation } from 'react-i18next';
+import { useNetworkState } from 'expo-network';
+import { useAccessibilityContext } from '../../context/AccessibilityContext';
+import { moderateScale } from 'react-native-size-matters';
+import { getScreenStyles } from '../../constants/Styles';
+import { useThemeColor } from '../../hooks/useThemeColor';
+import ScreenHeader from '../../components/ScreenHeader';
+import ThemedInput from '../../components/ThemedTextInput';
+import ThemedPicker from '../../components/ThemedPicker';
+import ThemedButton from '../../components/ThemedButton';
+import CountrySelector from '../../components/CountrySelector';
+import ThemedText from '../../components/ThemedText';
+import { useProfile } from '../../context/ProfileContext';
+import { Routes } from '../../constants/Routes';
+import { roles as roleGroups } from '../../constants/Roles';
+import { Sector } from '../../constants/Schemas';
+import * as Crypto from 'expo-crypto';
+import ProfileManager from '../../managers/ProfileManager';
+import AuthCodeInput from '../../components/AuthCodeInput';
+import { AuthManagerMock } from '../../managers/LoginManager';
+
+const Tab = ({ title, isActive, onPress, accessible, accessibilityRole, accessibilityLabel, accessibilityHint }) => {
+    const activeColor = useThemeColor({}, 'tint');
+    const inactiveColor = useThemeColor({}, 'background');
+    const activeTextColor = useThemeColor({}, 'background');
+    const inactiveTextColor = useThemeColor({}, 'text');
+    const { scaleFactor } = useAccessibilityContext();
+    const styles = getScreenStyles(scaleFactor);
+  
+    return (
+      <Pressable
+        onPress={onPress}
+        style={[
+          isActive ? styles.activeTab : styles.inactiveTab,
+          { backgroundColor: isActive ? activeColor : inactiveColor },
+        ]}
+        accessible={accessible}
+        accessibilityRole={accessibilityRole}
+        accessibilityLabel={accessibilityLabel}
+        accessibilityHint={accessibilityHint}
+      >
+        <ThemedText style={[{ color: isActive ? activeTextColor : inactiveTextColor, fontSize: moderateScale(12 * scaleFactor) }, styles.activeTabText]}>
+          {title}
+        </ThemedText>
+      </Pressable>
+    );
+};
+
+export default function OrgLoginMemberScreen({ navigation }) {
+    const { t } = useTranslation();
+    const { scaleFactor } = useAccessibilityContext();
+    const tintColor = useThemeColor({}, 'tint');
+    const styles = getScreenStyles(scaleFactor, tintColor);
+    const backgroundColor = useThemeColor({}, 'background');
+    const textColor = useThemeColor({}, 'text');
+    const { setProfile } = useProfile();
+
+    const [columnCount, setColumnCount] = useState(1);
+    const [didReadyForAuth, setDidReadyForAuth] = useState(null);
+    const networkState = useNetworkState();
+
+    useEffect(() => {
+        const updateColumns = () => {
+          const width = Dimensions.get('window').width;
+          setColumnCount(width > 800 ? 2 : 1);
+        };
+        updateColumns();
+        const subscription = Dimensions.addEventListener('change', updateColumns);
+        return () => subscription?.remove();
+    }, []);
+
+    const [email, setEmail] = useState('');
+    const [role, setRole] = useState('');
+    const [hasDomain, setHasDomain] = useState(true);
+    const [domain, setDomain] = useState('');
+    const [provider, setProvider] = useState('');
+    const [jurisdiction, setJurisdiction] = useState('');
+    const [sector, setSector] = useState('');
+    const [shortName, setShortName] = useState('');
+
+    const isFormValid = useMemo(() => {
+        if (!email || !role) return false;
+        if (hasDomain) {
+            return !!domain;
+        } else {
+            return !!provider && !!jurisdiction && !!sector && !!shortName;
+        }
+    }, [email, role, hasDomain, domain, provider, jurisdiction, sector, shortName]);
+
+    const handleFormSubmit = async () => {
+        let did;
+        const roleSuffix = role.split('.').pop();
+        if (hasDomain) {
+            did = `did:web:${domain}:employee:${email}:role:isco-08|${roleSuffix}`;
+        } else {
+            did = `did:web:${provider}:${shortName}:cds-${jurisdiction}:v1:${sector}:employee:${email}:role:isco-08|${roleSuffix}`;
+        }
+        
+        const hashedId = await Crypto.digestStringAsync(Crypto.CryptoDigestAlgorithm.SHA256, did);
+        const existingProfile = await ProfileManager.getProfileById(hashedId);
+
+        if (existingProfile) {
+            // Found an existing profile. Set it as active before proceeding to unlock.
+            setProfile(existingProfile);
+            navigation.navigate(Routes.Organization.LoginVerify.name, { requiresUnlock: true });
+        } else {
+            // No local profile. Create a new one and set it as active.
+            const newProfile = await ProfileManager.createNewAnonymousProfile(hashedId, { did });
+            setProfile(newProfile);
+            navigation.navigate(Routes.Organization.LoginVerify.name, { requiresUnlock: false });
+        }
+    };
+
+    const handleAuthSuccess = (jwtPayload) => {
+        console.log('[Login] Auth successful. Payload:', jwtPayload);
+        navigation.navigate('OrgDashboard');
+    };
+    
+    const roleItems = Object.values(roleGroups.managing).map((roleKey) => ({
+        value: roleKey,
+        label: t(`${roleKey}-label`),
+    }));
+
+    const sectorItems = Object.values(Sector).map(sector => ({
+        label: t(`pickers.sectors.${sector.replace('_', '-').toLowerCase()}`),
+        value: sector,
+    }));
+
+    const providerItems = [
+        { label: 'API-demo', value: 'api-demo.example.com' }
+    ];
+    
+    return (
+        <ScrollView style={{ flex: 1, backgroundColor }} contentContainerStyle={styles.scrollContainer}>
+            <ScreenHeader
+                title={t('organization.screens.login.title')}
+                subtitle={t('organization.screens.login.subtitle')}
+                accessible
+                accessibilityRole="header"
+                accessibilityLabel={t('organization.screens.login.title')}
+            />
+            
+            <View style={{ padding: 16 }}>
+                <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+                    <View style={{ width: `${100 / columnCount}%`, padding: 8 }}>
+                        <ThemedText style={styles.formLabel}>{t('organization.screens.login.email-label')}</ThemedText>
+                        <ThemedInput
+                            placeholder={t('common.forms.email-placeholder')}
+                            value={email}
+                            onChangeText={setEmail}
+                            keyboardType="email-address"
+                            autoCapitalize="none"
+                            editable={!didReadyForAuth}
+                        />
+                    </View>
+                    <View style={{ width: `${100 / columnCount}%`, padding: 8 }}>
+                        <ThemedText style={styles.formLabel}>{t('organization.screens.login.role-label')}</ThemedText>
+                        <ThemedPicker
+                            selectedValue={role}
+                            onValueChange={setRole}
+                            items={[{ label: t('organization.screens.newRepresentative.options.role-picker-placeholder'), value: '' }, ...roleItems]}
+                            enabled={!didReadyForAuth}
+                        />
+                    </View>
+                </View>
+
+                <ThemedText 
+                    style={[styles.formHeader, { color: textColor }]}
+                    accessible
+                    accessibilityRole="header"
+                    accessibilityLabel={t('organization.screens.login.connectorData-header')}
+                >
+                    {t('organization.screens.login.connectorData-header')}
+                </ThemedText>
+                <View style={styles.tabGroupContainer}>
+                    <View style={styles.tabGroup}>
+                        <Tab
+                            title={t('organization.screens.login.hasDomain-label')}
+                            isActive={hasDomain}
+                            onPress={() => !didReadyForAuth && setHasDomain(true)}
+                            accessible
+                            accessibilityRole="button"
+                            accessibilityLabel={t('organization.screens.login.hasDomain-label')}
+                            accessibilityHint="Select if your organization has its own domain for the connector"
+                        />
+                        <Tab
+                            title={t('organization.screens.login.isHosted-label')}
+                            isActive={!hasDomain}
+                            onPress={() => !didReadyForAuth && setHasDomain(false)}
+                            accessible
+                            accessibilityRole="button"
+                            accessibilityLabel={t('organization.screens.login.isHosted-label')}
+                            accessibilityHint="Select if your organization's connector is hosted by a provider"
+                        />
+                    </View>
+                </View>
+
+                <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+                    {hasDomain ? (
+                        <View style={{ width: '100%', padding: 8 }}>
+                            <ThemedText style={styles.formLabel}>{t('organization.screens.login.domain-label')}</ThemedText>
+                            <ThemedInput
+                                placeholder={t('organization.screens.login.domain-placeholder')}
+                                value={domain}
+                                onChangeText={setDomain}
+                                editable={!didReadyForAuth}
+                            />
+                        </View>
+                    ) : (
+                        <>
+                            <View style={{ width: `${100 / columnCount}%`, padding: 8 }}>
+                                <ThemedText style={styles.formLabel}>{t('organization.screens.login.provider-label')}</ThemedText>
+                                <ThemedPicker
+                                    selectedValue={provider}
+                                    onValueChange={setProvider}
+                                    items={providerItems}
+                                    enabled={!didReadyForAuth}
+                                />
+                            </View>
+                            <View style={{ width: `${100 / columnCount}%`, padding: 8 }}>
+                                <ThemedText style={styles.formLabel}>{t('organization.screens.login.shortName-label')}</ThemedText>
+                                <ThemedInput
+                                    placeholder={t('organization.screens.login.shortName-placeholder')}
+                                    value={shortName}
+                                    onChangeText={setShortName}
+                                    editable={!didReadyForAuth}
+                                />
+                            </View>
+                            <View style={{ width: `${100 / columnCount}%`, padding: 8 }}>
+                                <ThemedText style={styles.formLabel}>{t('organization.screens.login.jurisdiction-label')}</ThemedText>
+                                <CountrySelector
+                                    value={jurisdiction}
+                                    onChange={setJurisdiction}
+                                    placeholder={t('common.forms.jurisdictionPlaceholder')}
+                                    enabled={!didReadyForAuth}
+                                />
+                            </View>
+                            <View style={{ width: `${100 / columnCount}%`, padding: 8 }}>
+                                <ThemedText style={styles.formLabel}>{t('organization.screens.login.sector-label')}</ThemedText>
+                                <ThemedPicker
+                                    selectedValue={sector}
+                                    onValueChange={setSector}
+                                    items={[{ label: t('organization.screens.newEntity.options.sector-placeholder'), value: '' }, ...sectorItems]}
+                                    enabled={!didReadyForAuth}
+                                />
+                            </View>
+                        </>
+                    )}
+                </View>
+                
+                {!didReadyForAuth &&
+                    <ThemedButton
+                        title={t('continue')}
+                        onPress={handleFormSubmit}
+                        disabled={!isFormValid}
+                        style={{ marginTop: 32 }}
+                        accessible
+                        accessibilityRole="button"
+                        accessibilityLabel={t('continue')}
+                    />
+                }
+
+                {didReadyForAuth && (
+                    networkState.isInternetReachable ? (
+                        <View style={{marginTop: 20}}>
+                             <ScreenHeader
+                                title={t('organization.screens.orgCodeVerification.title')}
+                                subtitle={t('organization.screens.orgCodeVerification.subtitle')}
+                              />
+                            <AuthCodeInput 
+                                manager={new AuthManagerMock({ did: didReadyForAuth, email })} 
+                                onSuccess={handleAuthSuccess} 
+                            />
+                        </View>
+                    ) : (
+                        <View style={{marginTop: 20}}>
+                            <ThemedText style={{textAlign: 'center', marginBottom: 10}}>{t('noInternet')}</ThemedText>
+                            <ThemedButton
+                                title={t('workOffline')}
+                                onPress={() => navigation.navigate('OrgDashboard')}
+                                accessible
+                                accessibilityRole="button"
+                                accessibilityLabel={t('workOffline')}
+                            />
+                        </View>
+                    )
+                )}
+            </View>
+        </ScrollView>
+    );
+}

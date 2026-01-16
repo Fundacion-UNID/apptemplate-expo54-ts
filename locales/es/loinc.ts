@@ -1,0 +1,21 @@
+export default {
+  "48765-2": "Alergias e intolerancias",
+  "8716-3": "Signos vitales",
+  "11450-4": "Problemas actuales",
+  "11348-0": "Problemas pasados",
+  "10157-6": "Enfermedades familiares",
+  "10160-0": "Medicamentos",
+  "11369-6": "Inmunización",
+  "47519-4": "Procedimientos",
+  "61144-2": "Dieta",
+  "30954-2": "Resultados diagnósticos",
+  "18726-0": "Estudios de radiología", // incluye: Estudio de imagen diagnóstica, rayos X, CT, MRI, Mamografía, Medicina nuclear, Ultrasonido
+  "46264-8": "Dispositivos médicos",
+  "29762-2": "Historia social",
+  "10190-7": "Estado mental",
+  "47420-5": "Estado funcional",
+  "18776-5": "Plan de cuidado",
+  "82810-3": "Embarazo",
+  "10187-3": "Síntomas",
+  "42348-3": "Directrices anticipadas",
+};
