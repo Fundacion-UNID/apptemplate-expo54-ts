@@ -1,13 +1,15 @@
 // components/AccessibilityBar.js
 // Copyright 2026 Conéctate Soluciones y Aplicaciones SL under the Apache License, Version 2.0.
 
-import React, { useState } from 'react';
+import React from 'react';
 import { View, Pressable, StyleSheet, Text } from 'react-native';
 import { Icon } from 'react-native-elements';
 import { useAccessibilityContext } from '../context/AccessibilityContext';
 import { useThemeColor } from '../hooks/useThemeColor';
 import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
+import { useAppType } from '../context/AppTypeContext';
+import { Routes } from '../constants/Routes';
 // REMOVED: No longer importing the modal
 // import JobsStatusModal from './JobsStatusModal';
 
@@ -15,6 +17,7 @@ export default function AccessibilityBar() {
   const { accessibility, setAccessibility } = useAccessibilityContext();
   const { t, i18n } = useTranslation();
   const navigation = useNavigation<any>(); // Get navigation object
+  const { appType } = useAppType();
 
   const iconColor = useThemeColor({}, 'text');
   const bgColor = useThemeColor({}, 'background');
@@ -34,15 +37,27 @@ export default function AccessibilityBar() {
     i18n.changeLanguage(i18n.language === 'en' ? 'es' : 'en');
   };
 
+  const openUserPanel = () => {
+    if (appType === 'family') {
+      navigation.navigate(Routes.Family.Account.name);
+      return;
+    }
+    navigation.navigate('Jobs');
+  };
+
   return (
     <>
       <View style={[styles.container, { backgroundColor: bgColor }]}>
-        <Pressable 
-          onPress={() => navigation.navigate('Jobs')} // Navigate to the Jobs screen
+        <Pressable
+          onPress={openUserPanel}
           style={styles.button}
           accessible
           accessibilityRole="button"
-          accessibilityLabel={t('components.accessibilityBar.viewJobs')}
+          accessibilityLabel={
+            appType === 'family'
+              ? t('family.dashboard.options.account', 'My account')
+              : t('components.accessibilityBar.viewJobs')
+          }
         >
           <Icon name="person-outline" type="material" color={iconColor} />
         </Pressable>
@@ -86,7 +101,7 @@ export default function AccessibilityBar() {
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    justifyContent: 'flex-end',
+    justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 10,
     paddingTop: 10, // Adjust as needed for status bar

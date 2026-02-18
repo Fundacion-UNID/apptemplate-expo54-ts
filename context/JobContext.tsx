@@ -6,7 +6,7 @@ import { useProfile } from './ProfileContext';
 import { JobRequest, JobStatus } from 'gdc-common-utils-ts/models/confidential-job';
 import { IDecodedDidcommPayload } from 'gdc-common-utils-ts/models/confidential-message';
 import { ServiceEndpointSelector } from 'gdc-common-utils-ts/models/did';
-import { IJobManager } from 'gdc-sdk-client-ts/src/interfaces/IJobManager';
+import { IJobManager } from 'gdc-sdk-client-ts/interfaces/IJobManager';
 
 // --- Type Definitions for the Context ---
 

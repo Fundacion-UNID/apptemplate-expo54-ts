@@ -7,7 +7,7 @@ This document outlines the architecture for the client-side Wallet SDK, a self-c
 1.  **Separation of Concerns**: The architecture is layered to decouple application logic from platform-specific implementations and pure cryptographic operations.
 2.  **Dependency Injection**: High-level modules are agnostic of low-level implementations. Dependencies are injected, making the system portable and testable.
 3.  **Offline-First**: The primary source of truth is the local, on-device storage. Cloud services are used for backup and synchronization, not as the primary data store.
-4.  **Platform Agnosticism**: The core cryptographic engine (`crypto-ts`) is written in pure TypeScript and has zero dependencies on any specific runtime (like Expo or Node), making it reusable across any JavaScript/TypeScript project.
+4.  **Platform Agnosticism**: The core cryptographic engine (`gdc-common-utils-ts`) is written in pure TypeScript and has zero dependencies on any specific runtime (like Expo or Node), making it reusable across any JavaScript/TypeScript project.
 
 ## Architectural Layers
 
@@ -27,7 +27,7 @@ graph TD
         EW[managers/ExpoWallet.ts]
     end
 
-    subgraph "Agnostic Core SDK (crypto-ts)"
+    subgraph "Agnostic Core SDK (gdc-common-utils-ts)"
         IWallet[interfaces/IWallet.ts]
         CS[CryptographyService.ts]
         RandomGenInterface[interfaces/RandomGenerator.ts]
@@ -59,15 +59,15 @@ graph TD
 *   **Flow**: When asked to create a session, it instantiates the appropriate Wallet, uses the Wallet to provision keys, builds the profile object with those keys, and returns the complete session (`{ profile, wallet }`) to the UI.
 
 ### 3. Platform Implementation Layer (`managers/ExpoWallet.ts`)
-*   **Responsibility**: The "Adapter". It bridges the platform-agnostic `crypto-ts` SDK with the specific runtime environment (Expo).
+*   **Responsibility**: The "Adapter". It bridges the platform-agnostic `gdc-common-utils-ts` SDK with the specific runtime environment (Expo).
 *   **Knowledge**: This is the **only** high-level module that should `import` platform-specific libraries like `expo-crypto`.
 *   **Flow**:
-    1.  It implements the `IWallet` interface defined in `crypto-ts`.
+    1.  It implements the `IWallet` interface defined in `gdc-common-utils-ts`.
     2.  It contains the private `ExpoRandomGenerator` class, which implements the `RandomGenerator` interface using `expo-crypto`.
-    3.  In its constructor, it instantiates the `CryptographyService` (from `crypto-ts`) and injects the `ExpoRandomGenerator` into it.
+    3.  In its constructor, it instantiates the `CryptographyService` (from `gdc-common-utils-ts`) and injects the `ExpoRandomGenerator` into it.
     4.  It exposes methods like `provisionKeys`, which delegate the complex cryptographic work to the `CryptographyService` instance it owns.
 
-### 4. Agnostic Core SDK (`crypto-ts/`)
+### 4. Agnostic Core SDK (`gdc-common-utils-ts/`)
 *   **Responsibility**: The "Engine". Performs pure, stateless cryptographic operations. This entire directory is intended to be published as a reusable, framework-agnostic library.
 *   **Knowledge**: It has **zero knowledge** of Expo, Node, or any specific runtime. It operates only on the data and dependencies (like a `RandomGenerator`) that are passed to it.
 *   **Key Components**:
@@ -86,7 +86,7 @@ This document outlines the architecture for the client-side Wallet SDK, a self-c
 1.  **Separation of Concerns**: The architecture is layered to decouple application logic from platform-specific implementations and pure cryptographic operations.
 2.  **Dependency Injection**: High-level modules are agnostic of low-level implementations. Dependencies are injected, making the system portable and testable.
 3.  **Offline-First**: The primary source of truth is the local, on-device storage. Cloud services are used for backup and synchronization, not as the primary data store.
-4.  **Platform Agnosticism**: The core cryptographic engine (`crypto-ts`) is written in pure TypeScript and has zero dependencies on any specific runtime (like Expo or Node), making it reusable across any JavaScript/TypeScript project.
+4.  **Platform Agnosticism**: The core cryptographic engine (`gdc-common-utils-ts`) is written in pure TypeScript and has zero dependencies on any specific runtime (like Expo or Node), making it reusable across any JavaScript/TypeScript project.
 
 ## Architectural Layers
 
@@ -103,7 +103,7 @@ graph TD
     subgraph "Platform Implementation Layer (The Adapter)"
         EW[ExpoWallet.js]
     end
-    subgraph "Agnostic Core SDK (crypto-ts)"
+    subgraph "Agnostic Core SDK (gdc-common-utils-ts)"
         CS[CryptographyService.ts]
     end
     subgraph "Platform-Specific Primitives"
@@ -137,7 +137,7 @@ graph TD
     *   It instantiates the platform-agnostic `CryptographyService` and injects the `ExpoRandomGenerator` into it.
     *   It exposes high-level cryptographic methods like `provisionKeys()`, which internally call the `CryptographyService`.
 
-### 4. Agnostic Core SDK (`crypto-ts/`)
+### 4. Agnostic Core SDK (`gdc-common-utils-ts/`)
 *   **Responsibility**: To perform pure, stateless cryptographic operations. This is the reusable "engine".
 *   **Knowledge**: It has zero knowledge of Expo, Node, or any specific runtime. It operates only on the data and dependencies (like a `RandomGenerator`) that are passed to it.
 *   **Key Components**:
@@ -169,7 +169,7 @@ This document outlines the architecture for the client-side Wallet SDK, a self-c
 1.  **Separation of Concerns**: The architecture is layered to decouple application logic from platform-specific implementations and pure cryptographic operations.
 2.  **Dependency Injection**: High-level modules are agnostic of low-level implementations. Dependencies are injected, making the system portable and testable.
 3.  **Offline-First**: The primary source of truth is the local, on-device storage. Cloud services are used for backup and synchronization, not as the primary data store.
-4.  **Platform Agnosticism**: The core cryptographic engine (`crypto-ts`) is written in pure TypeScript and has zero dependencies on any specific runtime (like Expo or Node), making it reusable across any JavaScript/TypeScript project.
+4.  **Platform Agnosticism**: The core cryptographic engine (`gdc-common-utils-ts`) is written in pure TypeScript and has zero dependencies on any specific runtime (like Expo or Node), making it reusable across any JavaScript/TypeScript project.
 
 ## Architectural Layers
 
@@ -189,7 +189,7 @@ graph TD
         EW[managers/ExpoWallet.ts]
     end
 
-    subgraph "Agnostic Core SDK (crypto-ts)"
+    subgraph "Agnostic Core SDK (gdc-common-utils-ts)"
         IWallet[interfaces/IWallet.ts]
         CS[CryptographyService.ts]
         RandomGenInterface[interfaces/RandomGenerator.ts]
@@ -221,15 +221,15 @@ graph TD
 *   **Flow**: When asked to create a session, it instantiates the appropriate Wallet, uses the Wallet to provision keys, builds the profile object with those keys, and returns the complete session (`{ profile, wallet }`) to the UI.
 
 ### 3. Platform Implementation Layer (`managers/ExpoWallet.ts`)
-*   **Responsibility**: The "Adapter". It bridges the platform-agnostic `crypto-ts` SDK with the specific runtime environment (Expo).
+*   **Responsibility**: The "Adapter". It bridges the platform-agnostic `gdc-common-utils-ts` SDK with the specific runtime environment (Expo).
 *   **Knowledge**: This is the **only** high-level module that should `import` platform-specific libraries like `expo-crypto`.
 *   **Flow**:
-    1.  It implements the `IWallet` interface defined in `crypto-ts`.
+    1.  It implements the `IWallet` interface defined in `gdc-common-utils-ts`.
     2.  It contains the private `ExpoRandomGenerator` class, which implements the `RandomGenerator` interface using `expo-crypto`.
-    3.  In its constructor, it instantiates the `CryptographyService` (from `crypto-ts`) and injects the `ExpoRandomGenerator` into it.
+    3.  In its constructor, it instantiates the `CryptographyService` (from `gdc-common-utils-ts`) and injects the `ExpoRandomGenerator` into it.
     4.  It exposes methods like `provisionKeys`, which delegate the complex cryptographic work to the `CryptographyService` instance it owns.
 
-### 4. Agnostic Core SDK (`crypto-ts/`)
+### 4. Agnostic Core SDK (`gdc-common-utils-ts/`)
 *   **Responsibility**: The "Engine". Performs pure, stateless cryptographic operations. This entire directory is intended to be published as a reusable, framework-agnostic library.
 *   **Knowledge**: It has **zero knowledge** of Expo, Node, or any specific runtime. It operates only on the data and dependencies (like a `RandomGenerator`) that are passed to it.
 *   **Key Components**:

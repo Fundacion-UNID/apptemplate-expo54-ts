@@ -15,6 +15,8 @@ import ConfirmationModal from '../../components/ConfirmationModal';
 import { OrgButtons } from '../../constants/OrgButtons';
 import { getScreenStyles } from '../../constants/Styles';
 import { Routes } from '../../constants/Routes';
+import ThemedText from '../../components/ThemedText';
+import { useEntitlements } from '../../context/EntitlementContext';
 
 // Define a basic type for the navigation prop for this screen.
 type OrgDashboardScreenNavigationProp = {
@@ -31,6 +33,7 @@ const OrgDashboardScreen: React.FC<OrgDashboardScreenProps> = ({ navigation }) =
   const backgroundColor = useThemeColor({}, 'background');
   const { scaleFactor } = useAccessibilityContext();
   const { shutdownSession } = useProfile();
+  const { employeeAvailable } = useEntitlements();
   const styles = getScreenStyles(scaleFactor);
 
   const screenType = 'dashboard';
@@ -85,6 +88,9 @@ const OrgDashboardScreen: React.FC<OrgDashboardScreenProps> = ({ navigation }) =
           subtitle={t(`${i18nPath}.subtitle`)}
           description={t(`${i18nPath}.description`)}
         />
+        <ThemedText style={{ marginBottom: 10, opacity: 0.8 }}>
+          {t('organization.screens.dashboard.employeeLicenses', 'Available employee licenses')}: {employeeAvailable}
+        </ThemedText>
         <AccessibleButtonGrid data={buttons} onPress={handlePress} />
       </ScrollView>
       <ConfirmationModal

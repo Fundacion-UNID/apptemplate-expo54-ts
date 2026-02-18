@@ -3,31 +3,33 @@ import React from 'react';
 import { renderHook, waitFor } from '@testing-library/react-native';
 import { JobProvider, useJobs } from '../../context/JobContext';
 import { useProfile } from '../../context/ProfileContext';
-import JobManager from '../../managers/JobManager';
 
 // --- Mock Dependencies ---
-// 1. Mock the JobManager module itself. We want to control its behavior.
-jest.mock('../../managers/JobManager');
-// 2. Mock the useProfile hook, which is a dependency of JobProvider.
+// Mock the useProfile hook, which is a dependency of JobProvider.
 jest.mock('../../context/ProfileContext');
+jest.mock('../../platformServices', () => ({
+  appWallet: {},
+  createVaultForProfile: jest.fn(),
+}));
 
 describe('JobContext', () => {
-  const mockJobManagerInstance = {
-    initialize: jest.fn().mockResolvedValue(true),
-    shutdown: jest.fn(),
-    createJob: jest.fn(),
-    sync: jest.fn(),
-  };
+  let logSpy: jest.SpyInstance;
+
+  beforeAll(() => {
+    logSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+  });
 
   beforeEach(() => {
-    // Before each test, clear mocks and reset the JobManager constructor mock.
     jest.clearAllMocks();
-    JobManager.mockImplementation(() => mockJobManagerInstance);
+  });
+
+  afterAll(() => {
+    logSpy.mockRestore();
   });
 
   test('should provide a safe, non-functional interface while initializing', () => {
     // ARRANGE: Simulate the initial state where no profile is active yet.
-    useProfile.mockReturnValue({ profile: null });
+    useProfile.mockReturnValue({ profileManager: null, isLoading: false });
 
     // ACT: Render the useJobs hook within the provider.
     // `renderHook` is a utility from Testing Library for testing hooks.
@@ -42,13 +44,23 @@ describe('JobContext', () => {
     expect(typeof result.current.createJob).toBe('function');
 
     // 3. Verify that calling it returns a rejected promise, as per our fix.
-    return expect(result.current.createJob()).rejects.toThrow("Job system not ready.");
+    return expect(result.current.createJob()).rejects.toThrow('JobManager not ready');
   });
 
   test('should provide a functional interface after a profile is loaded', async () => {
     // ARRANGE: Simulate a profile being loaded.
-    const mockProfile = { id: 'user123', did: 'did:example:123' };
-    useProfile.mockReturnValue({ profile: mockProfile });
+    const mockJobManager = {
+      isInitialized: true,
+      createJob: jest.fn(),
+      createOrUpdateDraftJob: jest.fn(),
+      findDraftJobByFormType: jest.fn(),
+      sync: jest.fn(),
+    };
+    const mockProfileManager = {
+      jobManager: mockJobManager,
+      queryJobs: jest.fn(async () => []),
+    };
+    useProfile.mockReturnValue({ profileManager: mockProfileManager, isLoading: false });
 
     // ACT: Render the hook.
     const { result } = renderHook(() => useJobs(), { wrapper: JobProvider });
@@ -59,13 +71,10 @@ describe('JobContext', () => {
       expect(result.current.isJobSystemReady).toBe(true);
     });
 
-    // 2. Verify that the JobManager was initialized.
-    expect(JobManager).toHaveBeenCalledWith({ profile: mockProfile, listener: expect.any(Function) });
-    expect(mockJobManagerInstance.initialize).toHaveBeenCalled();
-
-    // 3. Verify that `createJob` is now the real (mocked) function from our instance.
+    // 2. Verify that `createJob` is now the real (mocked) function from our instance.
     // We can test this by calling it and checking if our mock was invoked.
-    result.current.createJob({ thid: 'test' });
-    expect(mockJobManagerInstance.createJob).toHaveBeenCalledWith({ thid: 'test' });
+    const payload = { thid: 'test' };
+    result.current.createJob(payload);
+    expect(mockJobManager.createJob).toHaveBeenCalledWith(payload, undefined);
   });
 });

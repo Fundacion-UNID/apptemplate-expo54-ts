@@ -4,6 +4,31 @@
 
 ## [Unreleased] - Architectural Overhaul
 
+### Added
+
+*   **Personal Evidence Composer flow (new reusable UI + contract draft):**
+    *   Added reusable component `PersonalEvidenceComposer` (`components/forms/PersonalEvidenceComposer.tsx`).
+    *   Replaced previous `OrgAddEvidenceScreen` placeholder with a full flow implementation using:
+        * `indexSection` targeting (instead of `clinicalSection`),
+        * `period` semantics (`startDate` + optional `endDate`),
+        * optional communication recipients/messages,
+        * confidential attachment and portal URL handling.
+    *   Introduced `PersonalEvidenceDraft` as emitted data model for end-to-end mapping to backend endpoints.
+    *   Wired Family navigation to the same reusable flow: `Documents -> Create` now opens `FamAddDocumentScreen` (`screens/family/FamAddDocumentScreen.tsx`) and reuses `PersonalEvidenceComposer`.
+
+*   **Internal security policy wiring for evidence publication:**
+    *   `qualifiedCreator` is now treated as an internal policy outcome (derived from trusted DID/role context), not a user-editable toggle.
+    *   Added explicit professional attestation checkbox for attachment/code review.
+    *   `registerResearchMetadata` is now policy-computed (not manually toggled), only when all required conditions are met:
+        1. qualified creator,
+        2. attachment present,
+        3. code selected,
+        4. attestation accepted.
+
+*   **Documentation for end-to-end flow:**
+    *   Added `docs/personal-evidence-flow.md` describing frontend behavior, backend contract mapping, and blockchain/statistics policy.
+    *   Updated backend integrator guide with concrete `PersonalEvidenceComposer` submission examples (`Bundle/_batch` + optional `Communication/_batch`).
+
 ## [Unreleased] - Architectural Refinement & DEMO Mode Overhaul
 
 This release focuses on hardening the SDK's architecture, improving the developer experience by exposing a richer public API, and implementing a robust, dynamic DEMO mode that correctly simulates the application's core flows.
@@ -44,8 +69,8 @@ This version represents a fundamental architectural refactoring of the Client SD
 
 *   **Implemented Core Business Flows using the New Architecture:**
     *   **Organization Onboarding:** The SDK now fully supports the critical business flow of registering a new organization and activating the first administrative device. The step for accepting the `Offer` is now implemented.
-        *   `OrgAdminService.createOrganization()`
-        *   `OrgAdminService.confirmOrder()`
+        *   `OrgAdminService.startOrganizationRegistration()`
+        *   `OrgAdminService.confirmOrganizationRegistration()`
         *   `CommonAuthService.activateDevice()`
     *   This flow is now driven by the robust, reusable services (`OrgAdminService`, `CommonAuthService`) instead of bespoke UI-layer logic.
 

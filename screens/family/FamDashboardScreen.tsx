@@ -15,7 +15,7 @@ import ThemedText from '../../components/ThemedText';
 import ThemedButton from '../../components/ThemedButton';
 import { useProfile } from '../../context/ProfileContext';
 import { useSubject } from '../../context/SubjectContext';
-import { buildScopesFromEndpoints } from 'gdc-sdk-client-ts/src/utils/scopeBuilder';
+import { buildScopesFromEndpoints } from 'gdc-sdk-client-ts';
 
 export default function FamilyDashboardScreen({ navigation }) {
   const { t } = useTranslation();
@@ -73,9 +73,9 @@ export default function FamilyDashboardScreen({ navigation }) {
         keyboardShouldPersistTaps="handled"
       >
         <ScreenHeader
-          title={t('family.dashboard.title')}
-          subtitle={t('family.dashboard.subtitle')}
-          description={t('family.dashboard.authGate', 'Fetching SMART access token for this session.')}
+          title={t('family.screens.dashboard.title')}
+          subtitle={t('family.screens.dashboard.subtitle')}
+          description={t('family.screens.dashboard.authGate', 'Fetching SMART access token for this session.')}
         />
         {isAuthorizing ? (
           <ActivityIndicator size="large" />
@@ -104,8 +104,8 @@ export default function FamilyDashboardScreen({ navigation }) {
       keyboardShouldPersistTaps="handled"
     >
       <ScreenHeader
-        title={t('family.dashboard.title')}
-        subtitle={t('family.dashboard.subtitle')}
+        title={t('family.screens.dashboard.title')}
+        subtitle={t('family.screens.dashboard.subtitle')}
       />
 
       <AccessibleButtonGrid data={buttons} onPress={(item) => navigation.navigate(item.route)} />

@@ -35,10 +35,6 @@ export const CommonButtons = (t: TFunction): CommonButtonsConfig => ({
     route: Routes.Family.Auth.name,
     appType: 'family',
     testID: 'family-button',
-    badge:{
-        content: 'new',
-        visible: true
-    }
   },
   {
     id: 'organization-button',
@@ -48,12 +44,6 @@ export const CommonButtons = (t: TFunction): CommonButtonsConfig => ({
     route: Routes.Organization.Auth.name,
     appType: 'organization',
     testID: 'organization-button',
-    badge: {
-        visible: true,
-        icon: 'alert-triangle',
-        family: 'feather',
-        type: 'warning'
-    }
     },
   ],
   auth:[  {
@@ -74,4 +64,3 @@ export const CommonButtons = (t: TFunction): CommonButtonsConfig => ({
     platform: 'ios', 
   }]
 });
-

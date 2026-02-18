@@ -1,45 +1,65 @@
 // __tests__/managers/ProfileManager.test.js
 
-import ProfileManager from '../../managers/ProfileManager';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
-// Mock AsyncStorage & Crypto
-jest.mock('@react-native-async-storage/async-storage', () => ({
-  setItem: jest.fn(() => Promise.resolve()),
-  getItem: jest.fn(() => Promise.resolve(null)),
-}));
-
-jest.mock('expo-crypto', () => ({
-  ...jest.requireActual('expo-crypto'),
-  randomUUID: jest.fn(() => 'mock-profile-uuid-12345'),
-}));
-
+import { ProfileManager } from 'gdc-sdk-client-ts/ProfileManager';
 
 describe('ProfileManager', () => {
+  let logSpy: jest.SpyInstance;
 
-  beforeEach(() => {
-    // Clear mocks and reset the manager's state before each test
-    AsyncStorage.setItem.mockClear();
-    AsyncStorage.getItem.mockClear();
-    ProfileManager.setCurrentProfile(null);
+  beforeAll(() => {
+    logSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
   });
 
-  it('should create a new anonymous profile, save it to storage, and set it as active', async () => {
-    // --- Action ---
-    const newProfile = await ProfileManager.createNewAnonymousProfile();
+  afterAll(() => {
+    logSpy.mockRestore();
+  });
 
-    // --- Verification ---
-    // 1. Check the returned profile object
-    expect(newProfile).toBeDefined();
-    expect(newProfile.id).toBeDefined();
-    expect(newProfile.isAnonymous).toBe(true);
+  it('should initialize with a job manager and common services', () => {
+    const profile = {
+      id: 'profile-123',
+      isAnonymous: false,
+      createdAt: new Date().toISOString(),
+      keys: { keys: [] },
+      role: 'ISCO-08|1120',
+      did: 'did:example:org-admin',
+    };
 
-    // 2. Check if it was set as the current profile
-    const currentProfile = ProfileManager.getCurrentProfile();
-    expect(currentProfile).toEqual(newProfile);
+    const manager = new ProfileManager({
+      profile,
+      wallet: {
+        protectConfidentialData: jest.fn(),
+        unprotectConfidentialData: jest.fn(),
+      } as any,
+      vault: {
+        initialize: jest.fn(),
+        put: jest.fn(),
+        query: jest.fn(),
+      } as any,
+      sdkConfig: {
+        crypto: { randomUUID: jest.fn(), digestString: jest.fn() },
+        network: { isConnected: jest.fn(async () => true) },
+        api: { operationMode: 'DEMO', legacyFhirEnabled: false },
+        fetcher: jest.fn(),
+      },
+      appInfo: {
+        appType: 'Organization',
+        sector: 'health-care',
+        applicationType: 'native',
+        redirectUris: [],
+        deviceInfo: {
+          device_id: 'device-1',
+          device_name: 'Device',
+          os: 'ios',
+          os_version: '1.0',
+        },
+      },
+      orgDidDoc: {
+        id: 'did:example:org',
+        controller: [profile.did],
+      } as any,
+    });
 
-    // 3. Check if it was saved correctly via the mock
-    expect(AsyncStorage.setItem).toHaveBeenCalledTimes(1);
-    expect(AsyncStorage.setItem).toHaveBeenCalledWith('profiles_list', JSON.stringify([newProfile]));
+    expect(manager.profile).toBe(profile);
+    expect(manager.jobManager).toBeDefined();
+    expect(manager.common.auth).toBeDefined();
   });
 });

@@ -7,7 +7,7 @@ import { scale } from 'react-native-size-matters';
 export default function Logo({ size = 80 }) {
   return (
     <Image
-      source={require('../assets/images/react-logo.png')}
+      source={require('../assets/brand/logo.png')}
       style={[styles.image, { width: scale(size), height: scale(size) }]}
       resizeMode="contain"
     />

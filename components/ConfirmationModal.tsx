@@ -16,6 +16,7 @@ interface ConfirmationModalProps {
   onCancel: () => void;
   confirmText?: string;
   cancelText?: string;
+  hideCancel?: boolean;
 }
 
 export default function ConfirmationModal({
@@ -26,6 +27,7 @@ export default function ConfirmationModal({
   onCancel,
   confirmText,
   cancelText,
+  hideCancel,
 }: ConfirmationModalProps) {
   const { t } = useTranslation();
   const { scaleFactor } = useAccessibilityContext();
@@ -44,15 +46,17 @@ export default function ConfirmationModal({
           <ThemedText style={styles.modalTitle}>{title}</ThemedText>
           <ThemedText style={styles.modalMessage}>{message}</ThemedText>
           <View style={styles.buttonContainer}>
-            <ThemedButton
-              title={cancelText || t('common.cancel')}
-              onPress={onCancel}
-              type="secondary"
-              style={styles.button}
-              accessible
-              accessibilityRole="button"
-              accessibilityLabel={cancelText || t('common.cancel')}
-            />
+            {!hideCancel && (
+              <ThemedButton
+                title={cancelText || t('common.cancel')}
+                onPress={onCancel}
+                type="secondary"
+                style={styles.button}
+                accessible
+                accessibilityRole="button"
+                accessibilityLabel={cancelText || t('common.cancel')}
+              />
+            )}
             <ThemedButton
               title={confirmText || t('common.confirm')}
               onPress={onConfirm}

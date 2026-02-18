@@ -1,6 +1,6 @@
 // database/VaultRepository.web.js
 import { openDB } from 'idb';
-import { IVaultRepository } from 'gdc-sdk-client-ts/src/interfaces/IVaultRepository';
+import { IVaultRepository } from 'gdc-sdk-client-ts/interfaces/IVaultRepository';
 
 /**
  * A web-optimized repository for the user's vault, using IndexedDB via the 'idb' library.

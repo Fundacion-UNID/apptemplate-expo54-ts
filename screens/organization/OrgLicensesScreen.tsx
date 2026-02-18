@@ -19,6 +19,7 @@ import { getIscoRoleLabelKey, roles as roleGroups } from '../../constants/Roles'
 import { Routes } from '../../constants/Routes';
 import { createVaultForProfile } from '../../platformServices';
 import { JobRequest, JobStatus } from 'gdc-common-utils-ts/models/confidential-job';
+import { useEntitlements } from '../../context/EntitlementContext';
 
 export default function OrgLicensesScreen() {
   const { t } = useTranslation();
@@ -29,6 +30,7 @@ export default function OrgLicensesScreen() {
 
   const { profileManager } = useProfile();
   const { accessToken: idToken } = useSubject();
+  const { employeeAvailable, consumeOne } = useEntitlements();
 
   const [email, setEmail] = useState('');
   const [role, setRole] = useState<string>('');
@@ -95,8 +97,8 @@ export default function OrgLicensesScreen() {
   );
 
   const canIssue = useMemo(() => {
-    return !!profileManager?.orgAdmin?.admin && !!idToken && !!email && !!role;
-  }, [profileManager, idToken, email, role]);
+    return !!profileManager?.orgAdmin?.admin && !!idToken && !!email && !!role && employeeAvailable > 0;
+  }, [profileManager, idToken, email, role, employeeAvailable]);
 
   const handleIssue = useCallback(async () => {
     if (!profileManager?.orgAdmin?.admin) {
@@ -105,6 +107,10 @@ export default function OrgLicensesScreen() {
     }
     if (!idToken) {
       setError('Authorization token is missing.');
+      return;
+    }
+    if (employeeAvailable <= 0) {
+      setError('No employee licenses available. Complete purchase/allocation first.');
       return;
     }
 
@@ -121,12 +127,13 @@ export default function OrgLicensesScreen() {
         type,
       });
       setIssuedThid(thid);
+      consumeOne('employee');
     } catch (e) {
       setError((e as Error).message);
     } finally {
       setIsLoading(false);
     }
-  }, [profileManager, idToken, email, role, type]);
+  }, [profileManager, idToken, email, role, type, employeeAvailable, consumeOne]);
 
   return (
     <View style={[styles.container, { backgroundColor }]}>
@@ -159,6 +166,9 @@ export default function OrgLicensesScreen() {
             {error}
           </ThemedText>
         )}
+        <ThemedText style={{ marginTop: 12, opacity: 0.8 }}>
+          {t('organization.screens.licenses.availableLicenses', 'Available employee licenses')}: {employeeAvailable}
+        </ThemedText>
 
         {issuedThid && (
           <>

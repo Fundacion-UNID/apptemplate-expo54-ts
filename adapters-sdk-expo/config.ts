@@ -2,7 +2,8 @@
 // File: adapters-sdk-expo/config.ts
 
 import Constants from 'expo-constants';
-import { IApiConfig } from 'gdc-sdk-client-ts/src/interfaces/others';
+import { IApiConfig } from 'gdc-sdk-client-ts/interfaces/others';
+import { getRetryPolicy } from '../utils/runtimeConfig';
 
 /**
  * Implements the SDK's IApiConfig interface using expo-constants.
@@ -21,6 +22,24 @@ export class AdapterApiConfigSdkExpo implements IApiConfig {
    * Defaults to `false` if not specified.
    */
   public readonly legacyFhirEnabled: boolean;
+  public readonly getRetryPolicy = (operationKey: string) => {
+    if (operationKey.startsWith('individual/') && operationKey.includes('/org.schema/Organization/_batch')) {
+      return getRetryPolicy('registerFamilyOrganization');
+    }
+    if (!operationKey.startsWith('individual/') && operationKey.includes('/org.schema/Organization/_batch')) {
+      return getRetryPolicy('registerOrganization');
+    }
+    if (operationKey.startsWith('individual/') && operationKey.includes('/org.schema/Order/_batch')) {
+      return getRetryPolicy('registerFamilyOrganization');
+    }
+    if (!operationKey.startsWith('individual/') && operationKey.includes('/org.schema/Order/_batch')) {
+      return getRetryPolicy('registerOrganization');
+    }
+    return {
+      retries: getRetryPolicy('registerOrganization').retries,
+      delayMs: getRetryPolicy('registerOrganization').delayMs,
+    };
+  };
 
   constructor() {
     const extra = Constants.expoConfig?.extra ?? {};

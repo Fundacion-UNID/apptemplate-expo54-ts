@@ -52,18 +52,25 @@ Esto es fundamental, ya que permite que el SDK utilice una única función (`gen
 
 ---
 
-## Identificador de Individuo (para Familias)
+## Identificador de Miembro de Familia
 
-El `did:web` de un individuo está vinculado al proveedor de servicios (organización) que elige durante su registro. Este proveedor forma la base (el prefijo) de su identificador digital.
+El `did:web` de un miembro de familia debe estar anclado al `familyId`, al identificador hash multibase derivado del email, y al rol de parentesco/profesión.
 
-**Formato:**
-`did:web:<provider_domain>:individual:multibase:z<multibase58_encoded_uuid>`
+**Formato objetivo:**
+`did:web:<provider_domain>:family:<family_id>:z<multibase_multihash_email>:<role_system>|<role_code>`
 
 **Desglose de componentes:**
--   `<provider_domain>`: El dominio del proveedor de servicios elegido por el individuo. Este es el mismo dominio que se usaría para un empleado de esa organización.
--   `individual`: Un segmento de ruta estático que indica que el tipo de identidad es individual.
--   `multibase:z<...>`: Un identificador único para el individuo, generado a partir de un UUID, y codificado en `base58btc` (prefijo `z`) para cumplir con el estándar Multibase.
+-   `<provider_domain>`: Dominio del proveedor (o `did:web` provider configurado).
+-   `family:<family_id>`: Identifica la unidad familiar/tenant.
+-   `z<multibase_multihash_email>`: Hash multibase del email del miembro (no UUID aleatorio).
+-   `<role_system>|<role_code>`: Rol HL7/ISCO en formato `system|code`.
 
 **Ejemplo:**
-Si un individuo se registra bajo el proveedor `api.proveedor.org` y se genera un UUID, su `did:web` sería:
-`did:web:api.proveedor.org:individual:multibase:z7922d37279c14480b435a222872c57d7e4c73f4e2e2a`
+`did:web:api.proveedor.org:family:zFam1234:zQmX...:HL7|MTH`
+
+### Nota de compatibilidad
+
+Actualmente parte del SDK aún genera el DID legacy:
+`did:web:<provider_domain>:individual:multibase:z<uuid>`
+
+Mientras se completa la migración del SDK, las pantallas de Family deben tratar ese formato como transitorio y priorizar el formato objetivo anterior en nuevas integraciones.

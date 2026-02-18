@@ -73,6 +73,8 @@ export default function CountrySelector({
   const { scaleFactor } = useAccessibilityContext();
   const tintColor = useThemeColor({}, 'tint');
   const textColor = useThemeColor({}, 'text');
+  const inputBackground = useThemeColor({}, 'inputBackground');
+  const inputBorder = useThemeColor({}, 'inputBorder');
   const [visible, setVisible] = useState(false);
   const [countryName, setCountryName] = useState('');
 
@@ -101,7 +103,7 @@ export default function CountrySelector({
   };
 
   const fieldStyle: ViewStyle = {
-    borderColor: tintColor,
+    borderColor: inputBorder,
     borderWidth: 1,
     borderRadius: scale(8),
     paddingVertical: scale(6),
@@ -109,6 +111,7 @@ export default function CountrySelector({
     marginBottom: scale(12),
     flexDirection: 'row',
     alignItems: 'center',
+    backgroundColor: inputBackground,
     opacity: disabled ? 0.6 : 1,
   };
 
@@ -192,22 +195,22 @@ export default function CountrySelector({
         transparent
       >
         <View style={styles.modalBackdrop}>
-          <View style={styles.modalCard}>
+          <View style={[styles.modalCard, { backgroundColor: inputBackground }]}>
             <CountryPicker
               show
               countryCodes={pickerCountryCodes}
               style={{
-                modal: { height: 420 },
-                textInput: { height: 42, fontSize: 16 },
-                countryName: { fontSize: 16 },
-                dialCode: { fontSize: 16 },
+                modal: { height: 420, backgroundColor: inputBackground },
+                textInput: { height: 42, fontSize: 16, color: textColor, backgroundColor: inputBackground },
+                countryName: { fontSize: 16, color: textColor },
+                dialCode: { fontSize: 16, color: textColor },
               }}
               pickerButtonOnPress={handleSelect}
               lang="en"
               inputPlaceholder="Search country"
             />
-            <Pressable style={styles.closeBtn} onPress={() => setVisible(false)}>
-              <Text style={styles.closeTxt}>Close</Text>
+            <Pressable style={[styles.closeBtn, { borderTopColor: inputBorder }]} onPress={() => setVisible(false)}>
+              <Text style={[styles.closeTxt, { color: textColor }]}>Close</Text>
             </Pressable>
           </View>
         </View>

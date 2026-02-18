@@ -10,7 +10,7 @@ import { JWK, JwkSet } from 'gdc-common-utils-ts/models/jwk';
 
 /**
  * @class ExpoCryptoHelper
- * Adapter that implements the ICryptoHelper interface from crypto-ts
+ * Adapter that implements the ICryptoHelper interface from gdc-common-utils-ts
  * using Expo's native crypto primitives. This is the bridge between the
  * platform-agnostic core and the Expo runtime.
  */

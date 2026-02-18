@@ -15,13 +15,16 @@ type ThemedTextInputProps = TextInputProps & {
 export default function ThemedTextInput({ style, disabled, editable, ...props }: ThemedTextInputProps) {
   const textColor = useThemeColor({}, 'text');
   const placeholderColor = useThemeColor({}, 'placeholder');
-  const borderColor = useThemeColor({}, 'tint');
+  const borderColor = useThemeColor({}, 'inputBorder');
+  const backgroundColor = useThemeColor({}, 'inputBackground');
+  const selectionColor = useThemeColor({}, 'tint');
 
   const { scaleFactor } = useAccessibilityContext();
 
   return (
     <TextInput
       placeholderTextColor={placeholderColor}
+      selectionColor={selectionColor}
       editable={typeof editable === 'boolean' ? editable : disabled ? false : true}
       style={[
         {
@@ -33,6 +36,7 @@ export default function ThemedTextInput({ style, disabled, editable, ...props }:
           paddingHorizontal: scale(12),
           fontSize: moderateScale(14 * scaleFactor),
           marginBottom: scale(12),
+          backgroundColor,
         },
         style,
       ]}

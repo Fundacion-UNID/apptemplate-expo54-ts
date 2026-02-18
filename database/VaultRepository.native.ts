@@ -1,7 +1,7 @@
 // database/VaultRepository.native.js
 // @ts-ignore
 import * as SQLite from 'expo-sqlite';
-import { IVaultRepository } from 'gdc-sdk-client-ts/src/interfaces/IVaultRepository';
+import { IVaultRepository } from 'gdc-sdk-client-ts/interfaces/IVaultRepository';
 
 /**
  * A robust, native-only repository for the user's vault, using Expo SQLite.

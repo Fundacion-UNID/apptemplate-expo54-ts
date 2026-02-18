@@ -2,7 +2,7 @@
 // Copyright 2026 Conéctate Soluciones y Aplicaciones SL under the Apache License, Version 2.0.
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, View } from 'react-native';
+import { ActivityIndicator, Linking, Platform, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useThemeColor } from '../../hooks/useThemeColor';
 import ScreenHeader from '../../components/ScreenHeader';
@@ -12,8 +12,11 @@ import { Routes } from '../../constants/Routes';
 import { useProfile } from '../../context/ProfileContext';
 import { useSubject } from '../../context/SubjectContext';
 import { createVaultForProfile } from '../../platformServices';
-import { defaultNetworkIdentifier } from 'gdc-sdk-client-ts/src/serviceSelectorRegistry';
+import { defaultNetworkIdentifier } from 'gdc-sdk-client-ts/serviceSelectorRegistry';
 import { JobRequest, JobStatus } from 'gdc-common-utils-ts/models/confidential-job';
+import { getRegistryRefreshIntervalMs } from '../../utils/runtimeConfig';
+import { useEntitlements } from '../../context/EntitlementContext';
+import { parseOfferEntitlementFromClaims } from 'gdc-sdk-client-ts';
 
 type Props = {
   route: { params?: { thid?: string } };
@@ -26,14 +29,6 @@ type StoredMessage = {
   statusCode?: number;
   content?: any;
 };
-
-function findOfferId(claims: Record<string, any> | undefined): string | undefined {
-  if (!claims) return undefined;
-  for (const [key, value] of Object.entries(claims)) {
-    if (typeof value === 'string' && key.endsWith('Offer.identifier')) return value;
-  }
-  return undefined;
-}
 
 function findActivationCode(claims: Record<string, any> | undefined): string | undefined {
   if (!claims) return undefined;
@@ -48,10 +43,16 @@ export default function OrgRegistrySentScreen({ route, navigation }: Props) {
 
   const { profileManager } = useProfile();
   const { accessToken: idToken } = useSubject();
+  const { setAvailable } = useEntitlements();
 
   const [job, setJob] = useState<JobRequest | null>(null);
   const [offerId, setOfferId] = useState<string | undefined>(undefined);
   const [activationCode, setActivationCode] = useState<string | undefined>(undefined);
+  const [offerQuantity, setOfferQuantity] = useState<string | undefined>(undefined);
+  const [offerUnitPrice, setOfferUnitPrice] = useState<string | undefined>(undefined);
+  const [offerTotalPrice, setOfferTotalPrice] = useState<string | undefined>(undefined);
+  const [offerTaxes, setOfferTaxes] = useState<string | undefined>(undefined);
+  const [checkoutUrl, setCheckoutUrl] = useState<string | undefined>(undefined);
   const [error, setError] = useState<string | null>(null);
   const [isBusy, setIsBusy] = useState(false);
 
@@ -86,20 +87,34 @@ export default function OrgRegistrySentScreen({ route, navigation }: Props) {
         responseContent?.body?.data?.[0]?.meta?.claims ||
         responseContent?.body?.entry?.[0]?.meta?.claims;
 
-      const extractedOfferId = findOfferId(responseClaims);
+      const offer = parseOfferEntitlementFromClaims(responseClaims);
+      const extractedOfferId = offer.offerId;
       const extractedActivationCode = findActivationCode(responseClaims);
+      const extractedOfferQuantity = typeof offer.quantity === 'number' ? String(offer.quantity) : undefined;
+      const extractedOfferUnitPrice = offer.unitPrice;
+      const extractedOfferTotalPrice = offer.totalPrice;
+      const extractedOfferTaxes = offer.taxes;
+      const extractedCheckoutUrl = offer.checkoutUrl;
 
       if (extractedOfferId) setOfferId(extractedOfferId);
       if (extractedActivationCode) setActivationCode(extractedActivationCode);
+      if (extractedOfferQuantity) setOfferQuantity(extractedOfferQuantity);
+      if (extractedOfferUnitPrice) setOfferUnitPrice(extractedOfferUnitPrice);
+      if (extractedOfferTotalPrice) setOfferTotalPrice(extractedOfferTotalPrice);
+      if (extractedOfferTaxes) setOfferTaxes(extractedOfferTaxes);
+      if (extractedCheckoutUrl) setCheckoutUrl(extractedCheckoutUrl);
+      if (extractedOfferQuantity) {
+        setAvailable('employee', Number(extractedOfferQuantity));
+      }
     } catch (e) {
       setError((e as Error).message);
     }
-  }, [profileManager, thid]);
+  }, [profileManager, thid, setAvailable]);
 
   useEffect(() => {
     if (!canContinue) return;
     refresh();
-    const handle = setInterval(refresh, 2500);
+    const handle = setInterval(refresh, getRegistryRefreshIntervalMs());
     return () => clearInterval(handle);
   }, [canContinue, refresh]);
 
@@ -123,10 +138,8 @@ export default function OrgRegistrySentScreen({ route, navigation }: Props) {
     setIsBusy(true);
     setError(null);
     try {
-      const gatewayDid = profileManager.orgDidDoc.id;
-      const { thid: orderThid } = await orgAdmin.confirmOrder(
+      const { thid: orderThid } = await orgAdmin.confirmOrganizationRegistration(
         offerId,
-        gatewayDid,
         idToken,
         defaultNetworkIdentifier
       );
@@ -187,6 +200,26 @@ export default function OrgRegistrySentScreen({ route, navigation }: Props) {
               <ThemedText selectable style={{ fontFamily: 'monospace', marginVertical: 8, textAlign: 'center' }}>
                 {offerId}
               </ThemedText>
+              {offerQuantity ? (
+                <ThemedText style={{ textAlign: 'center', opacity: 0.8 }}>
+                  Qty: {offerQuantity}
+                </ThemedText>
+              ) : null}
+              {offerUnitPrice ? (
+                <ThemedText style={{ textAlign: 'center', opacity: 0.8 }}>
+                  Unit: {offerUnitPrice}
+                </ThemedText>
+              ) : null}
+              {offerTaxes ? (
+                <ThemedText style={{ textAlign: 'center', opacity: 0.8 }}>
+                  Taxes: {offerTaxes}
+                </ThemedText>
+              ) : null}
+              {offerTotalPrice ? (
+                <ThemedText style={{ textAlign: 'center', opacity: 0.8, marginBottom: 8 }}>
+                  Total: {offerTotalPrice}
+                </ThemedText>
+              ) : null}
               <ThemedButton
                 title={t('organization.screens.registrySent.confirmOrder', 'Confirm order')}
                 onPress={handleConfirmOrder}
@@ -209,6 +242,20 @@ export default function OrgRegistrySentScreen({ route, navigation }: Props) {
                 disabled={isBusy}
               />
             </>
+          )}
+
+          {!activationCode && checkoutUrl && (
+            <ThemedButton
+              title={t('common.continue', 'Continue')}
+              onPress={() => {
+                if (Platform.OS === 'web') {
+                  window.open(checkoutUrl, '_blank');
+                } else {
+                  Linking.openURL(checkoutUrl);
+                }
+              }}
+              disabled={isBusy}
+            />
           )}
 
           {!offerId && !activationCode && (

@@ -58,6 +58,8 @@ export const sectorRoleCodes: Record<string, string[]> = {
     [Sector.HEALTH_CARE]: uniqueRoleCodes([...baseAdminRoleCodes, ...medicalRoleCodes, ...itRoleCodes]),
     [Sector.EMERGENCY]: uniqueRoleCodes([...baseAdminRoleCodes, ...medicalRoleCodes, ...emergencyRoleCodes, ...itRoleCodes]),
     [Sector.HEALTH_INSURANCE]: uniqueRoleCodes([...baseAdminRoleCodes, ...insuranceRoleCodes, ...itRoleCodes]),
+    [Sector.HEALTH_TECH]: uniqueRoleCodes([...baseAdminRoleCodes, ...medicalRoleCodes, ...itRoleCodes]),
+    [Sector.HEALTH_IT]: uniqueRoleCodes([...baseAdminRoleCodes, ...itRoleCodes]),
     [Sector.RESEARCH]: uniqueRoleCodes([...baseAdminRoleCodes, ...medicalRoleCodes, ...itRoleCodes]),
 };
 

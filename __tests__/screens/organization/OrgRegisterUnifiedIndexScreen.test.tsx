@@ -1,14 +1,7 @@
 // __tests__/screens/organization/OrgRegisterUnifiedIndexScreen.test.js
 import React from 'react';
 import { render, screen } from '@testing-library/react-native';
-import OrgRegisterUnifiedIndexScreen from '../../../screens/organization/OrgRegisterUnifiedIndexScreen';
-
-// Mock react-native's Platform module directly in this file.
-jest.mock('react-native/Libraries/Utilities/Platform', () => ({
-  OS: 'android',
-  select: (specs) => specs.android,
-}));
-
+import OrgManageUnifiedIndexScreen from '../../../screens/organization/OrgManageUnifiedIndexScreen';
 
 // Mock react-native's Platform module.
 jest.mock('react-native/Libraries/Utilities/Platform', () => ({
@@ -64,19 +57,19 @@ jest.mock('expo-document-picker', () => ({
 // TODO: This test suite is skipped due to a persistent Jest mock error:
 // "TypeError: _reactNative.Platform.select is not a function" when importing
 // from '@expo/vector-icons'. This needs to be investigated and fixed.
-describe.skip('OrgRegisterUnifiedIndexScreen', () => {
+describe('OrgManageUnifiedIndexScreen', () => {
   it('should render without crashing', () => {
     // ARRANGE: All the mocks above provide the necessary environment.
 
     // ACT: Attempt to render the component.
     // If there is a syntax error (like the mismatched brace), this `render`
     // call will fail, and the test will crash, catching the bug.
-    render(<OrgRegisterUnifiedIndexScreen />);
+    render(<OrgManageUnifiedIndexScreen />);
 
     // ASSERT: We make a simple assertion to prove the render was successful.
     // We check if the title of the screen is visible.
     // The `getByText` function will throw an error if the text is not found.
-    const titleText = screen.getByText('organization.screens.registerUnifiedIndex.title');
+    const titleText = screen.getByText('unifiedID.manageTitle');
     expect(titleText).toBeTruthy();
   });
 });

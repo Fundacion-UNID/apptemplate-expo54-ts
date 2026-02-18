@@ -80,6 +80,7 @@ export default {
           "legalValue-placeholder": "e.g., 123456789",
           "sector-label": "Sector",
           "sector-placeholder": "-- Select --",
+          "networkRole-placeholder": "-- Select network role --",
           "legalName-label": "Legal Name",
           "legalName-placeholder": "Official Name",
           "shortName-label": "Short Name for Hosting",
@@ -87,6 +88,7 @@ export default {
           "shortName-description": "Used to create the organization's URL. Use only lowercase letters, numbers, and hyphens.",
           "domain-label": "Specific Domain or Subdomain (Optional)",
           "domain-placeholder": "e.g., api.acme.org",
+          "domain-help": "Optional custom domain. If set, the DID becomes did:web:<domain> (no hosted path).",
           "commercialName-label": "Commercial Name (Optional)",
           "commercialName-placeholder": "The name used for business",
           "address1-label": "Address Line",
@@ -98,7 +100,8 @@ export default {
           "region-label": "State / Province / Region",
           "region-placeholder": "State or region",
           "postalCode-label": "ZIP / Postal Code",
-          "postalCode-placeholder": "Postal code"
+          "postalCode-placeholder": "Postal code",
+          "provider-help": "Provider host is used when no custom domain is set (hosted DID with tenant/jurisdiction/sector)."
         }
       },
 

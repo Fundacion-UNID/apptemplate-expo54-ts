@@ -24,8 +24,9 @@ export default function ThemedCheckbox({
   ...props
 }: ThemedCheckboxProps) {
   const textColor = useThemeColor({}, 'text');
-  const borderColor = useThemeColor({}, 'text');
-  const fillColor = useThemeColor({}, 'tint');
+  const borderColor = useThemeColor({}, 'inputBorder');
+  const fillColor = useThemeColor({}, 'checkboxCheckedBackground');
+  const boxBackground = useThemeColor({}, 'inputBackground');
 
   const { accessibility } = useAccessibilityContext();
   const interfaceSize = accessibility.interfaceSize || 'M';
@@ -51,7 +52,7 @@ export default function ThemedCheckbox({
             width: size,
             height: size,
             borderColor,
-            backgroundColor: checked ? fillColor : 'transparent',
+            backgroundColor: checked ? fillColor : boxBackground,
           },
         ]}
       />

@@ -22,7 +22,7 @@ The architecture is divided into two main layers:
 
 These are platform-agnostic, pure TypeScript libraries with zero dependencies on any specific UI framework.
 
--   **`crypto-ts/`**: A low-level cryptography library providing the fundamental cryptographic primitives and interfaces.
+-   **`gdc-common-utils-ts/`**: A low-level cryptography library providing the fundamental cryptographic primitives and interfaces.
 -   **`client-sdk-ts/`**: The main SDK "engine" that orchestrates business logic and defines the interfaces (`IWallet`, `ICryptoHelper`, etc.) that platform-specific packages must implement.
 
 #### 2. The Platform Packages (The "Chassis" for Expo)

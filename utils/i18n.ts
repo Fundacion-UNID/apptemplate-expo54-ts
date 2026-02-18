@@ -3,6 +3,7 @@
 
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
+import * as Localization from 'expo-localization';
 import translationsEN from '../locales/en/index';
 import translationsES from '../locales/es/index';
 
@@ -28,9 +29,22 @@ const resources = {
     }
 };
 
+const detectDefaultLanguage = () => {
+    const locale = Localization.getLocales?.()[0]?.languageTag || Localization.locale;
+    if (locale) {
+        return locale.toLowerCase().startsWith('es') ? 'es' : 'en';
+    }
+    if (typeof navigator !== 'undefined' && typeof navigator.language === 'string') {
+        return navigator.language.toLowerCase().startsWith('es') ? 'es' : 'en';
+    }
+    return 'en';
+};
+
 i18n.use(initReactI18next).init({
     resources,
+    lng: detectDefaultLanguage(),
     fallbackLng: 'en',
+    supportedLngs: ['en', 'es'],
     returnNull: false,
     returnEmptyString: false,
     interpolation: { escapeValue: false },

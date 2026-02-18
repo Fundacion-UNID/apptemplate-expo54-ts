@@ -11,17 +11,17 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode, useMemo } from 'react';
 import { ClientSDK, InitializeSessionParams } from 'gdc-sdk-client-ts';
 import { CryptographyService } from 'gdc-common-utils-ts/CryptographyService';
-import { VerifierService } from 'gdc-sdk-client-ts/src/VerifierService';
-import { ProfileManager } from 'gdc-sdk-client-ts/src/ProfileManager';
-import { IProfile } from 'gdc-sdk-client-ts/src/interfaces/IProfile';
+import { VerifierService } from 'gdc-sdk-client-ts/VerifierService';
+import { ProfileManager } from 'gdc-sdk-client-ts/ProfileManager';
+import { IProfile } from 'gdc-sdk-client-ts/interfaces/IProfile';
 import { AdapterCryptoSdkExpo, AdapterNetworkSdkExpo, AdapterApiConfigSdkExpo } from '../adapters-sdk-expo';
 import Constants from 'expo-constants';
 import { appWallet, createVaultForProfile } from '../platformServices';
-import { AppInfo, DeviceInfo, SdkConfig, MockOptions } from 'gdc-sdk-client-ts/src/interfaces/others';
+import { AppInfo, DeviceInfo, SdkConfig, MockOptions } from 'gdc-sdk-client-ts/interfaces/others';
 import { Platform } from 'react-native';
 import * as Device from 'expo-device';
 // Import mock data ONLY for DEMO mode
-import { MOCK_ICA_DID_DOCUMENT, MOCK_ROOT_GOVERNING_KEY_PUB } from 'gdc-sdk-client-ts/data/demo/didProvider.data';
+import { MOCK_ICA_DID_DOCUMENT, MOCK_ROOT_GOVERNING_KEY_PUB } from '../data/demo/sdkMockData';
 
 // --- Context Type Definition ---
 interface ProfileContextValue {
@@ -42,6 +42,37 @@ const ProfileContext = createContext<ProfileContextValue | undefined>(undefined)
 interface ProfileProviderProps {
     children: ReactNode;
 }
+
+const isLoopbackHost = (host: string): boolean => {
+    const normalized = host.toLowerCase();
+    return (
+        normalized === 'localhost' ||
+        normalized.startsWith('localhost:') ||
+        normalized === '127.0.0.1' ||
+        normalized.startsWith('127.0.0.1:')
+    );
+};
+
+/**
+ * SDK compatibility shim:
+ * Some SDK DID resolvers currently build URLs like:
+ *   https://localhost%3A3000/.well-known/did.json
+ * which are invalid for fetch().
+ * We decode host "%3A" -> ":" and use http:// for loopback hosts.
+ */
+const normalizeSdkFetchUrl = (rawUrl: string): string => {
+    if (!rawUrl) return rawUrl;
+    const match = rawUrl.match(/^https:\/\/([^/]+)(\/.*)?$/i);
+    if (!match) return rawUrl;
+
+    const encodedHost = match[1] || '';
+    if (!/%3A/i.test(encodedHost)) return rawUrl;
+
+    const decodedHost = encodedHost.replace(/%3A/gi, ':');
+    const suffix = match[2] || '';
+    const protocol = isLoopbackHost(decodedHost) ? 'http' : 'https';
+    return `${protocol}://${decodedHost}${suffix}`;
+};
 
 export const ProfileProvider = ({ children }: ProfileProviderProps) => {
     const [profileManager, setProfileManager] = useState<ProfileManager | null>(null);
@@ -91,7 +122,27 @@ export const ProfileProvider = ({ children }: ProfileProviderProps) => {
             crypto: cryptoAdapter,
             network: new AdapterNetworkSdkExpo(),
             api: new AdapterApiConfigSdkExpo(),
-            fetcher: globalThis.fetch.bind(globalThis),
+            fetcher: async (input: RequestInfo | URL, init?: RequestInit) => {
+                const originalUrl =
+                    typeof input === 'string'
+                        ? input
+                        : input instanceof URL
+                            ? input.href
+                            : input.url;
+                const normalizedUrl = normalizeSdkFetchUrl(originalUrl);
+                const normalizedInput: RequestInfo | URL =
+                    typeof input === 'string' ? normalizedUrl : normalizedUrl !== originalUrl ? new URL(normalizedUrl) : input;
+                try {
+                    const response = await globalThis.fetch(normalizedInput, init);
+                    if (response.status === 404) {
+                        console.warn(`Not found: ${normalizedUrl}`);
+                    }
+                    return response;
+                } catch (error) {
+                    console.warn(`Not found: ${normalizedUrl}`);
+                    throw error;
+                }
+            },
             mockOptions: mockOptions,
         };
 

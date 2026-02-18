@@ -26,11 +26,33 @@ export default {
   "continue": "Continuar",
   "noInternet": "No hay conexión a internet",
   "workOffline": "Trabajar sin conexión",
+  "modals": {
+    "registration": {
+      "operatorNotFoundTitle": "Operador no encontrado",
+      "providerNotFoundTitle": "Proveedor no encontrado",
+      "operatorNotFoundWithProvider": "No se encontró la ruta de registro en \"{{provider}}\". Puedes cambiar de operador o continuar sin conexión para revisar la demo.",
+      "operatorNotFoundGeneric": "No se encontró la ruta de registro para este operador. Cambia el operador o continúa sin conexión para revisar la demo.",
+      "providerNotFoundWithDid": "No se encontró la ruta de registro para \"{{providerDid}}\". Puedes cambiar de proveedor o continuar sin conexión para revisar la demo.",
+      "providerNotFoundGeneric": "No se encontró la ruta de registro para este proveedor. Cambia el proveedor o continúa sin conexión para revisar la demo.",
+      "noOperatorConnection": "No hay conexión con el operador. Cambia de operador o continúa sin conexión para revisar la demo.",
+      "noProviderConnection": "No hay conexión con el proveedor. Cambia de proveedor o continúa sin conexión para revisar la demo.",
+      "changeOperator": "Cambiar operador",
+      "changeProvider": "Cambiar proveedor",
+      "continueOffline": "Continuar sin conexión",
+      "authRequired": "La autenticación es obligatoria. Inicia sesión para continuar."
+    },
+    "errors": {
+      "title": "Error",
+      "close": "Cerrar",
+      "missingFields": "Faltan campos obligatorios."
+    }
+  },
   "legalName": "Nombre legal",
   "commercialName": "Nombre comercial",
   "shortName": "Nombre corto",
   "website": "Sitio web",
   "sector": "Sector",
+  "networkRole": "Rol en la red",
   "identifierType": "Tipo de identificador",
   "identifierValue": "Número de identificador",
   "jurisdiction": "Jurisdicción",
@@ -139,7 +161,13 @@ export default {
       "emergency": "Emergencias",
       "health-care": "Continuidad Asistencial",
       "health-insurance": "Seguros de salud",
+      "health-tech": "Tecnología sanitaria",
+      "health-it": "IT sanitaria",
       "research": "Investigación"
+    },
+    "networkRoles": {
+      "provider": "Proveedor",
+      "data-reader": "Lector de datos"
     }
   },
   "forms": {

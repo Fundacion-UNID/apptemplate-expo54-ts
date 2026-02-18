@@ -12,7 +12,7 @@
 import { Platform } from 'react-native';
 import Constants from 'expo-constants';
 import { IWallet } from 'gdc-common-utils-ts/interfaces/IWallet';
-import { IVaultRepository } from 'gdc-sdk-client-ts/src/interfaces/IVaultRepository';
+import { IVaultRepository } from 'gdc-sdk-client-ts/interfaces/IVaultRepository';
 
 // --- Concrete Implementations ---
 import { DemoExpoWallet } from './managers/DemoExpoWallet';

@@ -24,18 +24,27 @@ export const FamilyButtons = (t: TFunction) => ({
   dashboard: [
     {
       label: t('family.dashboard.options.communications', 'Communications'),
-      iconName: 'email',
+      iconName: 'chat',
+      iconType: 'material',
       route: Routes.Family.Communications.name,
     },
     {
-      label: t('family.dashboard.options.selectSubject', 'Select subject'),
-      iconName: 'person-search',
-      route: Routes.Family.SelectSubject.name,
+      label: t('family.dashboard.options.identity', 'Digital identity'),
+      iconName: 'badge',
+      iconType: 'material',
+      route: Routes.Family.Identity.name,
     },
     {
-      label: t('family.dashboard.options.devices', 'Devices'),
-      iconName: 'devices',
-      route: Routes.Family.Devices.name,
+      label: t('family.dashboard.options.documents', 'Documents'),
+      iconName: 'folder-open',
+      iconType: 'material',
+      route: Routes.Family.DocumentsMenu.name,
+    },
+    {
+      label: t('family.dashboard.options.dataSpace', 'Data space'),
+      iconName: 'apartment',
+      iconType: 'material',
+      route: Routes.Family.DataSpace.name,
     },
   ],
 
@@ -44,24 +53,25 @@ export const FamilyButtons = (t: TFunction) => ({
   // ----------------------------
   identity: [
     {
-      label: t('family.identity.shareId'),
-      iconName: "qr-code",
-      route: Routes.Family.ShareID.name,
+      label: t('family.screens.identityMenu.options.add', 'Add'),
+      iconName: 'person-add',
+      iconType: 'material',
     },
     {
-      label: t('family.identity.linkIdentifiers'),
-      iconName: "link",
-      route: Routes.Family.LinkIdentifiers.name,
+      label: t('family.screens.identityMenu.options.search', 'Search'),
+      iconName: 'search',
+      iconType: 'material',
+      route: Routes.Family.SelectSubject.name,
     },
     {
-      label: t('family.identity.issueCredential'),
-      iconName: "id-card",
-      route: Routes.Family.IssueCredential.name,
+      label: t('family.screens.identityMenu.options.evidence', 'Identity evidence'),
+      iconName: 'fact-check',
+      iconType: 'material',
     },
     {
-      label: t('family.identity.readIdentity'),
-      iconName: "search",
-      route: Routes.Family.ReadIdentity.name,
+      label: t('family.screens.identityMenu.options.shareId', 'Share my ID'),
+      iconName: 'qr-code',
+      iconType: 'material',
     },
   ],
 
@@ -96,29 +106,49 @@ export const FamilyButtons = (t: TFunction) => ({
   // -------------------------
   documents: [
     {
-      label: t('family.documents.selectSubject'),
-      iconName: "person-search",
+      label: t('family.screens.documents.options.index', 'Index'),
+      iconName: 'folder',
+      iconType: 'material',
       route: Routes.Family.SelectSubject.name,
     },
     {
-      label: t('family.documents.scanId'),
-      iconName: "qr-code-scanner",
-      route: Routes.Family.ScanID.name,
-    },
-    {
-      label: t('family.documents.indexSections'),
-      iconName: "folder",
-      route: Routes.Family.IndexSections.name,
-    },
-    {
-      label: t('family.documents.addDocument'),
-      iconName: "add-circle",
+      label: t('family.screens.documents.options.create', 'Create document'),
+      iconName: 'note-add',
+      iconType: 'material',
       route: Routes.Family.AddDocument.name,
     },
     {
-      label: t('family.documents.summaryRecords'),
-      iconName: "description",
-      route: Routes.Family.SummaryRecords.name,
+      label: t('family.screens.documents.options.signature', 'Signature and certification'),
+      iconName: 'verified',
+      iconType: 'material',
+    },
+    {
+      label: t('family.screens.documents.options.traceability', 'Verification and traceability'),
+      iconName: 'manage-search',
+      iconType: 'material',
+    },
+  ],
+
+  dataSpace: [
+    {
+      label: t('family.screens.dataSpace.options.organizations', 'Organizations'),
+      iconName: 'corporate-fare',
+      iconType: 'material',
+    },
+    {
+      label: t('family.screens.dataSpace.options.departments', 'Departments / services'),
+      iconName: 'local-hospital',
+      iconType: 'material',
+    },
+    {
+      label: t('family.screens.dataSpace.options.locations', 'Nearby locations'),
+      iconName: 'location-on',
+      iconType: 'material',
+    },
+    {
+      label: t('family.screens.dataSpace.options.myProvider', 'My provider'),
+      iconName: 'account-balance',
+      iconType: 'material',
     },
   ],
 
@@ -129,31 +159,37 @@ export const FamilyButtons = (t: TFunction) => ({
     {
       label: t('groupsLabel'),
       iconName: "group",
+      iconType: 'material',
       route: Routes.Family.ChatGroups.name,
     },
     {
       label: t('contacts'),
-      iconName: "contact",
+      iconName: "contacts",
+      iconType: 'material',
       route: Routes.Family.Contacts.name,
     },    
     {
       label: t('inbox'),
       iconName: "inbox",
+      iconType: 'material',
       route: Routes.Family.Inbox.name,
     },
     {
       label: t('sent'),
       iconName: "send",
+      iconType: 'material',
       route: Routes.Family.Sent.name,
     },
     {
       label: t('drafts'),
       iconName: "drafts",
+      iconType: 'material',
       route: Routes.Family.Drafts.name,
     },
     {
       label: t('sync'),
       iconName: "sync",
+      iconType: 'material',
       route: Routes.Family.Outbox.name,
     },
   ],

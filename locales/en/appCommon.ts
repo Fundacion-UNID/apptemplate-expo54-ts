@@ -27,11 +27,33 @@ export default {
   continue: "Continue",
   noInternet: "No internet connection",
   workOffline: "Work Offline",
+  modals: {
+    registration: {
+      operatorNotFoundTitle: "Operator not found",
+      providerNotFoundTitle: "Provider not found",
+      operatorNotFoundWithProvider: "Registration route not found at \"{{provider}}\". You can change operator or continue offline to review the demo.",
+      operatorNotFoundGeneric: "Registration route not found for this operator. Change operator or continue offline to review the demo.",
+      providerNotFoundWithDid: "Registration route not found for \"{{providerDid}}\". You can change provider or continue offline to review the demo.",
+      providerNotFoundGeneric: "Registration route not found for this provider. Change provider or continue offline to review the demo.",
+      noOperatorConnection: "No connection to the operator. Change operator or continue offline to review the demo.",
+      noProviderConnection: "No connection to the provider. Change provider or continue offline to review the demo.",
+      changeOperator: "Change operator",
+      changeProvider: "Change provider",
+      continueOffline: "Continue offline",
+      authRequired: "Authentication is required. Please log in to continue.",
+    },
+    errors: {
+      title: "Error",
+      close: "Close",
+      missingFields: "Missing required fields.",
+    },
+  },
   legalName: "Legal name",
   commercialName: "Commercial name",
   shortName: "Short name",
   website: "Website",
   "sector": "Sector",
+  "networkRole": "Network Role",
   "identifierType": "Identifier type",
   "identifierValue": "Identifier number",
   "jurisdiction": "Jurisdiction",
@@ -142,7 +164,13 @@ export default {
       "emergency": "Emergency",
       "health-care": "Healthcare",
       "health-insurance": "Health Insurance",
+      "health-tech": "Health Tech",
+      "health-it": "Health IT",
       "research": "Research"
+    },
+    "networkRoles": {
+      "provider": "Provider",
+      "data-reader": "Data Reader"
     }
   },
   "forms": {

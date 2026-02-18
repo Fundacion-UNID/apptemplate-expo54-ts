@@ -21,9 +21,10 @@ export default function ScreenLayout({ title, children }: ScreenLayoutProps) {
 
   const titleColor = useThemeColor({}, 'buttonPrimaryBackground');
   const cardColor = useThemeColor({}, 'surface'); // cambia con el tema
+  const backgroundColor = useThemeColor({}, 'background');
 
   return (
-    <View style={styles.outerContainer}>
+    <View style={[styles.outerContainer, { backgroundColor }]}>
       <View style={[styles.innerCard, { backgroundColor: cardColor }]}>
         <Text
           style={[
@@ -48,7 +49,6 @@ export default function ScreenLayout({ title, children }: ScreenLayoutProps) {
 const styles = StyleSheet.create({
   outerContainer: {
     flex: 1,
-    backgroundColor: '#d9d9d9', // gris fijo para toda la pantalla
     justifyContent: 'center',
     alignItems: 'center',
     padding: scale(16),

@@ -1,4 +1,4 @@
-import JobManager from 'gdc-sdk-client-ts/src/JobManager';
+import JobManager from 'gdc-sdk-client-ts/JobManager';
 import { JobStatus } from 'gdc-common-utils-ts/models/confidential-job';
 import { DRAFT_EMPLOYEES_BODY_INITIAL, DRAFT_EMPLOYEES_BODY_UPDATED } from '../data/employee.data';
 

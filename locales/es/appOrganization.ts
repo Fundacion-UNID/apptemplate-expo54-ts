@@ -13,6 +13,7 @@ export default {
         "legalValue-placeholder": "Introducir el identificador legal",
         "sector-label": "Sector",
         "sector-placeholder": "-- Seleccionar --",
+        "networkRole-placeholder": "-- Seleccionar rol de red --",
         "legalName-label": "Nombre legal",
         "legalName-placeholder": "Nombre legal",
         "shortName-label": "Nombre corto (para hosting)",
@@ -20,6 +21,7 @@ export default {
         "shortName-description": "Se utiliza para crear la URL de la organización. Usar solo minúsculas, números y guiones.",
         "domain-label": "Dominio o subdominio específico",
         "domain-placeholder": "opcional: ej., api.acme.org",
+        "domain-help": "Dominio opcional. Si se indica, el DID pasa a ser did:web:<dominio> (sin path alojado).",
         "commercialName-label": "Nombre comercial",
         "commercialName-placeholder": "opcional: ej., Acme",
         "address1-label": "Línea de dirección",
@@ -31,7 +33,8 @@ export default {
         "region-label": "Estado / Provincia / Región",
         "region-placeholder": "Estado o región",
         "postalCode-label": "Código postal",
-        "postalCode-placeholder": "número"
+        "postalCode-placeholder": "número",
+        "provider-help": "El host del proveedor se usa cuando no hay dominio propio (DID alojado con tenant/jurisdiction/sector)."
       }
     },
     "auth": {

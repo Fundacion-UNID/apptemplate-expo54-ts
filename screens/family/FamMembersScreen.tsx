@@ -18,6 +18,7 @@ import { useSubject } from '../../context/SubjectContext';
 import { Routes } from '../../constants/Routes';
 import { createVaultForProfile } from '../../platformServices';
 import { JobRequest, JobStatus } from 'gdc-common-utils-ts/models/confidential-job';
+import { useEntitlements } from '../../context/EntitlementContext';
 
 export default function FamMembersScreen() {
   const { t } = useTranslation();
@@ -28,6 +29,7 @@ export default function FamMembersScreen() {
 
   const { profileManager } = useProfile();
   const { accessToken: idToken } = useSubject();
+  const { memberAvailable, consumeOne } = useEntitlements();
 
   const [email, setEmail] = useState('');
   const [role, setRole] = useState('');
@@ -88,8 +90,8 @@ export default function FamMembersScreen() {
   );
 
   const canIssue = useMemo(() => {
-    return !!profileManager?.familyAdmin?.it && !!idToken && !!email && !!role;
-  }, [profileManager, idToken, email, role]);
+    return !!profileManager?.familyAdmin?.it && !!idToken && !!email && !!role && memberAvailable > 0;
+  }, [profileManager, idToken, email, role, memberAvailable]);
 
   const handleIssue = useCallback(async () => {
     const familyAdmin = profileManager?.familyAdmin?.it;
@@ -99,6 +101,10 @@ export default function FamMembersScreen() {
     }
     if (!idToken) {
       setError('Authorization token is missing.');
+      return;
+    }
+    if (memberAvailable <= 0) {
+      setError('No member licenses available. Complete purchase/allocation first.');
       return;
     }
 
@@ -115,12 +121,13 @@ export default function FamMembersScreen() {
         type,
       });
       setIssuedThid(thid);
+      consumeOne('member');
     } catch (e) {
       setError((e as Error).message);
     } finally {
       setIsLoading(false);
     }
-  }, [profileManager, idToken, email, role, type]);
+  }, [profileManager, idToken, email, role, type, memberAvailable, consumeOne]);
 
   return (
     <View style={[styles.container, { backgroundColor }]}>
@@ -155,6 +162,9 @@ export default function FamMembersScreen() {
             {error}
           </ThemedText>
         )}
+        <ThemedText style={{ marginTop: 12, opacity: 0.8 }}>
+          {t('family.screens.members.availableLicenses', 'Available member licenses')}: {memberAvailable}
+        </ThemedText>
 
         {issuedThid && (
           <>

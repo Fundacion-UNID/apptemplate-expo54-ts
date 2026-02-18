@@ -58,14 +58,15 @@ export default {
         dashboard: {
             title: "Panel Familiar",
             subtitle: "Gestionar miembros, permisos y citas",
+            authGate: "Obteniendo el token SMART de acceso para esta sesion.",
+            memberLicenses: "Licencias de miembro disponibles",
             description: "Resumen y gestión de la familia.",
             options: {
-                "myEntity-button-label": "Mi Familia",
-                "myEntity-button-description": "Gestionar miembros, permisos y citas de la familia.",
-                "consents-button-label": "Consentimientos",
-                "consents-button-description": "Gestionar consentimientos de la familia.",
-                "appointments-button-label": "Citas",
-                "appointments-button-description": "Gestionar citas familiares."
+                communications: "Comunicaciones",
+                identity: "Identidad digital",
+                documents: "Documentos",
+                dataSpace: "Espacio de datos",
+                account: "Mi cuenta"
             },
             messages: {
                 welcome: "Bienvenida al panel familiar."
@@ -90,10 +91,14 @@ export default {
         },
 
         identityMenu: {
-            title: "Gestión de Identidad",
-            subtitle: "Gestionar identificadores y credenciales",
+            title: "Identidad digital",
+            subtitle: "Operaciones de identidad y evidencias",
             description: "Gestionar identificadores y credenciales de los miembros de la familia.",
             options: {
+                add: "Añadir",
+                search: "Buscar",
+                evidence: "Evidencias de identidad",
+                shareId: "Compartir mi ID",
                 "shareId-button-label": "Compartir ID / QR",
                 "shareId-button-description": "Pulsar para mostrar el código QR para compartir el identificador.",
                 "linkIdentifiers-button-label": "Vincular Identificadores de Individuo",
@@ -146,6 +151,10 @@ export default {
           subtitle: "Gestionar registros y documentos",
           description: "Añadir, visualizar o gestionar documentos y secciones relacionados con esta familia.",
           options: {
+              index: "Índice",
+              create: "Crear documento",
+              signature: "Firma y certificación",
+              traceability: "Verificación y trazabilidad",
               "selectSubject-button-label": "Seleccionar sujeto / Escanear ID",
               "selectSubject-button-description": "Seleccionar una persona o escanear su código QR.",
               "scanId-button-label": "Escanear ID",
@@ -187,6 +196,28 @@ export default {
           errors: {
               deliveryFailed: "No se pudo entregar la comunicación."
           },
+      },
+      dataSpace: {
+        title: "Espacio de datos",
+        subtitle: "Organizaciones, servicios y ubicaciones",
+        options: {
+          organizations: "Organizaciones adheridas",
+          departments: "Departamentos / servicios",
+          locations: "Ubicaciones cercanas",
+          myProvider: "Mi provider"
+        }
+      },
+      account: {
+        title: "Mi cuenta",
+        subtitle: "Perfil, DID y sesión",
+        email: "Email",
+        role: "Rol",
+        did: "Mi DID",
+        providerDid: "DID del provider",
+        token: "Token disponible",
+        tasksHistory: "Historial de tareas",
+        jobs: "Mis jobs",
+        logout: "Cerrar sesión"
       },
       connections: {
         'Family Health': 'Salud Familiar',

@@ -5,6 +5,7 @@ import { Text as RNText, TextProps, StyleProp, TextStyle } from 'react-native';
 import { useThemeColor } from '../hooks/useThemeColor';
 import { useAccessibilityContext } from '../context/AccessibilityContext';
 import { getScreenStyles } from '../constants/Styles';
+import Colors from '../constants/Colors';
 
 // Define the component's props interface
 interface ThemedTextProps extends TextProps {
@@ -21,9 +22,15 @@ export default function ThemedText({
   variant = 'body',
   ...props
 }: ThemedTextProps) {
-  const color = useThemeColor({ light: lightColor, dark: darkColor }, 'text');
-
   const { scaleFactor } = useAccessibilityContext();
+  const { accessibility } = useAccessibilityContext();
+  const theme = accessibility?.colorTheme || 'light';
+  const useTitleAccent = theme === 'light' && (variant === 'title' || variant === 'subtitle');
+
+  const color = useThemeColor(
+    { light: lightColor ?? (useTitleAccent ? Colors.dark.background : undefined), dark: darkColor },
+    'text'
+  );
   const styles = getScreenStyles(scaleFactor);
 
   return (

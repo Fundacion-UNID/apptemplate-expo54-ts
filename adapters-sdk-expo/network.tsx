@@ -2,7 +2,7 @@
 // File: adapters-sdk-expo/network.ts
 
 import NetInfo from '@react-native-community/netinfo';
-import { INetwork } from 'gdc-sdk-client-ts/src/interfaces/others';
+import { INetwork } from 'gdc-sdk-client-ts/interfaces/others';
 
 /**
  * Implements the SDK's INetwork interface using the @react-native-community/netinfo library.

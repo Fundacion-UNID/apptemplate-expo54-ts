@@ -4,7 +4,7 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { ScrollView, View, Alert } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { useRoute, RouteProp } from '@react-navigation/native';
+import { useRoute, RouteProp, CommonActions } from '@react-navigation/native';
 
 import ScreenHeader from '../../components/ScreenHeader';
 import ThemedInput from '../../components/ThemedTextInput';
@@ -16,17 +16,18 @@ import { Routes } from '../../constants/Routes';
 import CountrySelector from '../../components/CountrySelector';
 import ThemedText from '../../components/ThemedText';
 import ThemedPicker from '../../components/ThemedPicker';
-import { FamilyProvidersByCountry } from '../../constants/Providers';
 import { HL7_PERSONAL_RELATIONSHIP_ROLES } from '../../data/hl7-personal-relationship';
 import { useProfile } from '../../context/ProfileContext';
 import { deriveProfileId } from '../../utils/profileId';
+import { Sector } from '../../constants/Schemas';
 import { appWallet } from '../../platformServices';
 import { hashEmail } from '../../utils/emailHash';
-import { entityMldsaJwk, entityMlkemJwk } from 'gdc-sdk-client-ts/data/demo/entityKeys.data';
+import { entityMldsaJwk, entityMlkemJwk, entityUrnCds } from '../../data/demo/sdkMockData';
 import { MldsaPublicJwk, MlkemPublicJwk } from 'gdc-common-utils-ts/interfaces/Cryptography.types';
-import { entityUrnCds } from 'gdc-sdk-client-ts/data/demo/didProvider.data';
 import { generateDidDocument_forMock, generateWellKnownServices_forMock, generateGatewayEntityServices_forMock } from 'gdc-sdk-client-ts';
 import { getBaseUrlFromDidWeb, normalizeDidWeb } from 'gdc-common-utils-ts/utils/did';
+import { toDidRoleCode } from '../../utils/roleCoding';
+import { resolveFamilyProviders } from '../../utils/providerDiscovery';
 
 type FamilyJoinRouteParams = {
   FamilyJoin: { email: string; idToken: string };
@@ -43,19 +44,44 @@ export default function FamilyJoinScreen({ navigation }) {
 
   const [country, setCountry] = useState('');
   const [providerId, setProviderId] = useState('');
+  const [discoveredProviders, setDiscoveredProviders] = useState<Array<{ id: string; nameKey: string; label?: string; domain: string; did?: string; sector?: string; country?: string }>>([]);
   const [familyId, setFamilyId] = useState('');
   const [role, setRole] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const resetToDashboard = () =>
+    navigation.dispatch(
+      CommonActions.reset({
+        index: 0,
+        routes: [{ name: Routes.Family.Dashboard.name }],
+      })
+    );
 
   const providerOptions = useMemo(() => {
     if (!country) return [];
-    const list = FamilyProvidersByCountry[country as keyof typeof FamilyProvidersByCountry] ?? [];
+    const list = discoveredProviders;
     return list.map((provider) => ({
       id: provider.id,
-      label: String(t(provider.nameKey, provider.id)),
+      label: provider.label ? String(provider.label) : String(t(provider.nameKey, provider.id)),
       domain: provider.domain,
+      did: provider.did,
     }));
-  }, [country, t]);
+  }, [country, t, discoveredProviders]);
+
+  useEffect(() => {
+    let mounted = true;
+    if (!country) {
+      setDiscoveredProviders([]);
+      return;
+    }
+    (async () => {
+      const providers = await resolveFamilyProviders(Sector.HEALTH_CARE);
+      if (!mounted) return;
+      setDiscoveredProviders(providers);
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, [country]);
 
   const selectedProvider = useMemo(() => {
     return providerOptions.find((provider) => provider.id === providerId) ?? providerOptions[0];
@@ -63,11 +89,11 @@ export default function FamilyJoinScreen({ navigation }) {
 
   const roleItems = useMemo(() => {
     const hl7Items = HL7_PERSONAL_RELATIONSHIP_ROLES.map((roleItem) => ({
-      value: `HL7|${roleItem.code}`,
+      value: roleItem.code,
       label: String(t(`family.roles.${roleItem.code}.label`, roleItem.display)),
     }));
     const caregiverItem = {
-      value: 'ISCO-08|5322',
+      value: '5322',
       label: String(t('family.roles.CAREGIVER.label', 'Caregiver')),
     };
     return [caregiverItem, ...hl7Items];
@@ -83,7 +109,7 @@ export default function FamilyJoinScreen({ navigation }) {
       return;
     }
     setIsLoading(true);
-    const providerDid = `did:web:${domain.toLowerCase()}`;
+    const providerDid = selectedProvider?.did || `did:web:${domain.toLowerCase()}`;
     try {
       const profileId = await deriveProfileId({
         appType: 'Family',
@@ -97,6 +123,11 @@ export default function FamilyJoinScreen({ navigation }) {
         role,
         providerDid,
         appType: 'Family',
+        familyId,
+      });
+      await manager?.updateProfile?.({
+        profileDisplay: familyId,
+        familyLabel: familyId,
       });
 
       if (profileRegistry) {
@@ -116,7 +147,7 @@ export default function FamilyJoinScreen({ navigation }) {
       if (manager?.profile?.status === 'pending') {
         navigation.navigate(Routes.Family.DeviceActivate.name, { idToken });
       } else {
-        navigation.navigate(Routes.Family.Dashboard.name);
+        resetToDashboard();
       }
     } catch (error) {
       if (operationMode === 'DEMO') {
@@ -126,8 +157,9 @@ export default function FamilyJoinScreen({ navigation }) {
           email,
           role,
         });
-        const multibaseId = `z${profileId.replace(/-/g, '')}`;
-        const didController = normalizeDidWeb(`${providerDid}:family:${familyId}:multibase:${multibaseId}:${role}`);
+        const emailHashForDid = await hashEmail(email);
+        const roleCodeForDid = toDidRoleCode(role, 'ONESELF');
+        const didController = normalizeDidWeb(`${providerDid}:family:${familyId}:z${emailHashForDid}:${roleCodeForDid}`);
         const publicKeys = await appWallet.provisionKeys(profileId);
         const mldsa = publicKeys.keys.find((key) => key.kty === 'AKP') as MldsaPublicJwk | undefined;
         const mlkem = publicKeys.keys.find((key) => key.kty === 'OKP') as MlkemPublicJwk | undefined;
@@ -162,6 +194,11 @@ export default function FamilyJoinScreen({ navigation }) {
           role,
           providerDid,
           appType: 'Family',
+          familyId,
+        });
+        await manager?.updateProfile?.({
+          profileDisplay: familyId,
+          familyLabel: familyId,
         });
         if (profileRegistry) {
           const emailHash = await hashEmail(email);
@@ -179,7 +216,7 @@ export default function FamilyJoinScreen({ navigation }) {
         if (manager?.profile?.status === 'pending') {
           navigation.navigate(Routes.Family.DeviceActivate.name, { idToken });
         } else {
-          navigation.navigate(Routes.Family.Dashboard.name);
+          resetToDashboard();
         }
       } else {
         Alert.alert(t('common.error'), (error as Error).message || t('common.unknownError'));

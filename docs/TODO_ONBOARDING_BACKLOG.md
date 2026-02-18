@@ -44,10 +44,10 @@ TODOs:
 
 - [ ] `OrganizationRegistrationWizard` (uses `docs/forms/organization-registration-form.md`):
   - [ ] build claims object (schema.org)
-  - [ ] call SDK `OrgAdminService.createOrganization(...)`
+  - [ ] call SDK `OrgAdminService.startOrganizationRegistration(...)`
   - [ ] poll job and show Offer summary (offer id, eligible quantity, payment method)
 - [ ] `OrganizationOrderConfirmScreen`:
-  - [ ] call SDK `OrgAdminService.confirmOrder(offerId, hostDid, idToken, targetNetwork)`
+  - [ ] call SDK `OrgAdminService.confirmOrganizationRegistration(offerId, idToken, targetNetwork)`
   - [ ] poll and persist:
     - [ ] tenant/provider DID (for later calls)
     - [ ] organization “assurance/trust” artifacts availability

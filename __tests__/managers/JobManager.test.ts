@@ -1,6 +1,6 @@
 // __tests__/managers/JobManager.test.ts
 
-import JobManager from 'gdc-sdk-client-ts/src/JobManager';
+import JobManager from 'gdc-sdk-client-ts/JobManager';
 import { JobStatus } from 'gdc-common-utils-ts/models/confidential-job';
 
 const mockProfile = {

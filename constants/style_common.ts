@@ -25,7 +25,7 @@ export const AppDimensions = {
   mainBorderWidth: 1,
 
     // Icon Sizes
-  logo: 65,              // Reduced by 30%
+  logo: 72,              // Slightly larger logo
   badgeIcon: 16,
   cardIcon: 28,
 
@@ -81,8 +81,8 @@ export const getScreenStyles = (scaleFactor = 1, tintColor?: string) => {
       fontSize: moderateScale(AppDimensions.formInput * scaleFactor), // Use specific form size
     },
     button: {
-      paddingVertical: scale(6 * scaleFactor), // Reduced vertical padding
-      paddingHorizontal: scale(24 * scaleFactor),
+      paddingVertical: scale(5.4 * scaleFactor),
+      paddingHorizontal: scale(21.6 * scaleFactor),
       marginTop: scale(12 * scaleFactor),
       borderRadius: scale(8 * scaleFactor),
       borderWidth: 1,

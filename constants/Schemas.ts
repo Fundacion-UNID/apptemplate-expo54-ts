@@ -106,6 +106,8 @@ export const Sector = {
   EMERGENCY: 'emergency',
   HEALTH_CARE: 'health-care',
   HEALTH_INSURANCE: 'health-insurance',
+  HEALTH_TECH: 'health-tech',
+  HEALTH_IT: 'health-it',
   RESEARCH: 'research',
 } as const;
 export type Sector = typeof Sector[keyof typeof Sector];

@@ -64,7 +64,12 @@ export default function FamDeviceActivateScreen() {
         t('common.screens.activateDevice.successTitle'),
         t('common.screens.activateDevice.successMessage')
       );
-      navigation.navigate(Routes.Family.Dashboard.name);
+      navigation.dispatch(
+        CommonActions.reset({
+          index: 0,
+          routes: [{ name: Routes.Family.Dashboard.name }],
+        })
+      );
     } catch (error) {
       if (operationMode === 'DEMO') {
         if (profileManager.profile) {

@@ -102,7 +102,7 @@ The application is designed as if it were shipping a core, platform-agnostic Sof
 
 ### The Core SDK (`@your-org/core-sdk`)
 Contains all reusable, platform-agnostic business logic.
-- **Contents**: `JobManager`, `crypto-ts`, all interfaces (`IWallet`, `IVaultRepository`), all data models.
+- **Contents**: `JobManager`, `gdc-common-utils-ts`, all interfaces (`IWallet`, `IVaultRepository`), all data models.
 - **Key Rule**: Depends only on interfaces, never concrete implementations. Marked with `@sdk`.
 
 ### The Application Shell (The "App")

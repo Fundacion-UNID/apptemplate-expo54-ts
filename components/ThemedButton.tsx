@@ -2,10 +2,12 @@
 // Copyright 2026 Conéctate Soluciones y Aplicaciones SL under the Apache License, Version 2.0.
 
 import React from 'react';
-import { Pressable, Text, PressableProps, StyleProp, ViewStyle, TextStyle } from 'react-native';
+import { Pressable, Text, PressableProps, StyleProp, ViewStyle, TextStyle, StyleSheet } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useAccessibilityContext } from '../context/AccessibilityContext';
 import { getScreenStyles } from '../constants/Styles';
 import { useThemeColor } from '../hooks/useThemeColor';
+import Colors from '../constants/Colors';
 
 // Define the props for the component
 // We extend PressableProps to inherit all standard props like accessibilityLabel, onPress, etc.
@@ -29,9 +31,10 @@ export default function ThemedButton({
   type = 'primary',
   ...props
 }: ThemedButtonProps) {
-  const { scaleFactor } = useAccessibilityContext();
+  const { scaleFactor, accessibility } = useAccessibilityContext();
   const styles = getScreenStyles(scaleFactor);
   const isDisabled = disabled || loading;
+  const theme = accessibility?.colorTheme || 'light';
 
   // Determine background and text colors based on the button type and disabled state
   const backgroundColor = useThemeColor(
@@ -55,6 +58,12 @@ export default function ThemedButton({
           : 'buttonSecondaryText'
   );
 
+  const useGradient = theme === 'dark' && !isDisabled && type !== 'outline';
+  const gradientColors =
+    type === 'secondary'
+      ? Colors.dark.buttonSecondaryGradient ?? [Colors.dark.buttonSecondaryBackground, Colors.dark.secondary]
+      : Colors.dark.buttonPrimaryGradient ?? [Colors.dark.buttonPrimaryBackground, Colors.dark.primary];
+
   return (
     <Pressable
       onPress={onPress}
@@ -62,11 +71,12 @@ export default function ThemedButton({
       style={({ pressed }) => [
         styles.button,
         {
-          backgroundColor: backgroundColor,
+          backgroundColor: useGradient ? 'transparent' : backgroundColor,
           borderColor: type === 'outline' ? textColor : backgroundColor,
           opacity: pressed || isDisabled ? 0.5 : 1,
           alignSelf: 'center',
           minWidth: '60%',
+          overflow: useGradient ? 'hidden' : 'visible',
         },
         style, // Apply custom styles passed in via props
         buttonStyle,
@@ -76,6 +86,17 @@ export default function ThemedButton({
       // Ensure accessibilityRole is explicitly set if not passed in props
       accessibilityRole={props.accessibilityRole || "button"} 
     >
+      {useGradient && (
+        <LinearGradient
+          colors={gradientColors}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={[
+            StyleSheet.absoluteFillObject,
+            { borderRadius: (styles.button as any).borderRadius ?? 8 },
+          ]}
+        />
+      )}
       <Text
         style={[
           styles.formButtonText,

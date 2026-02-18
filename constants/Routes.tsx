@@ -14,6 +14,10 @@ export const Routes = {
     New: { name: 'FamilyNew', path: '/family/new' },
     RegistrySent: { name: 'FamilyRegistrySent', path: '/family/register-sent' },
     Dashboard: { name: 'FamilyDashboard', path: '/family/dashboard' },
+    Identity: { name: 'FamilyIdentityMenu', path: '/family/identity' },
+    DocumentsMenu: { name: 'FamilyDocumentsMenu', path: '/family/documents' },
+    DataSpace: { name: 'FamilyDataSpace', path: '/family/data-space' },
+    Account: { name: 'FamilyAccount', path: '/family/account' },
 
     // Communications
     Communications: { name: 'FamilyCommunications', path: '/family/communications' },

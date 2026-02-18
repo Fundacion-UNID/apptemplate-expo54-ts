@@ -26,10 +26,9 @@ import { useProfile } from '../../context/ProfileContext';
 import { Routes } from '../../constants/Routes';
 import { getIscoRoleLabelKey, organizationRoleCodes, sectorRoleCodes } from '../../constants/Roles';
 import { Sector } from '../../constants/Schemas';
-import { ServiceProviders } from '../../constants/Providers';
+import { ServiceProviders, getServiceProvidersForSector } from '../../constants/Providers';
 
-import { entityMldsaJwk, entityMlkemJwk } from 'gdc-sdk-client-ts/data/demo/entityKeys.data';
-import { entityUrnCds } from 'gdc-sdk-client-ts/data/demo/didProvider.data';
+import { entityMldsaJwk, entityMlkemJwk, entityUrnCds } from '../../data/demo/sdkMockData';
 import { generateDidDocument_forMock, generateWellKnownServices_forMock, generateGatewayEntityServices_forMock } from 'gdc-sdk-client-ts';
 import { buildHostedDidDetails, getBaseUrlFromDidWeb, normalizeDidWeb } from 'gdc-common-utils-ts/utils/did';
 import { MldsaPublicJwk, MlkemPublicJwk } from 'gdc-common-utils-ts/interfaces/Cryptography.types';
@@ -123,6 +122,19 @@ export default function OrgLoginMemberScreen() {
     const [jurisdiction, setJurisdiction] = useState<string>('');
     const [sector, setSector] = useState<string>('');
     const [shortName, setShortName] = useState<string>('');
+
+    const providersForSelectedSector = useMemo(
+        () => getServiceProvidersForSector(sector),
+        [sector]
+    );
+
+    useEffect(() => {
+        if (!providersForSelectedSector.length) return;
+        const hasSelectedProvider = providersForSelectedSector.some((item) => item.url === provider);
+        if (!hasSelectedProvider) {
+            setProvider(providersForSelectedSector[0].url);
+        }
+    }, [provider, providersForSelectedSector]);
 
     const isFormValid = useMemo(() => {
         if (!role) return false;
@@ -374,7 +386,7 @@ export default function OrgLoginMemberScreen() {
                                 <ThemedPicker
                                     selectedValue={provider}
                                     onValueChange={setProvider}
-                                    items={ServiceProviders.map(p => ({ label: p.name, value: p.url }))}
+                                    items={providersForSelectedSector.map((item) => ({ label: item.name, value: item.url }))}
                                 />
                             </View>
                             <View style={{ width: `${100 / columnCount}%`, padding: 8 }}>

@@ -149,7 +149,9 @@ export default function ProfileSelectScreen() {
 
       <View style={{ width: '100%', padding: 16 }}>
         {profiles.length === 0 ? (
-          <ThemedText style={{ opacity: 0.7 }}>{emptyMessage}</ThemedText>
+          <ThemedText style={{ opacity: 0.7, textAlign: 'center', width: '100%', marginBottom: 16 }}>
+            {emptyMessage}
+          </ThemedText>
         ) : (
           profiles.map((entry) => (
             <Pressable

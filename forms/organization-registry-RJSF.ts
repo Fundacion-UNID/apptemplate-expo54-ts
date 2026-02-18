@@ -24,6 +24,7 @@ export type OrgRegistrationForm = {
   [ClaimsOrganizationSchemaorg.identifierType]?: string;
   [ClaimsOrganizationSchemaorg.identifierValue]?: string;
   [ClaimsServiceSchemaorg.category]?: string;
+  [ClaimsServiceSchemaorg.serviceType]?: string;
   [ClaimsOrganizationSchemaorg.legalName]?: string;
   [ClaimsOrganizationSchemaorg.name]?: string;
   [ClaimsOrganizationSchemaorg.streetAddress]?: string;
@@ -61,6 +62,7 @@ export const registrationSchemaPart1: RJSFSchema = {
     [ClaimsOrganizationSchemaorg.alternateName]: { type: "string", title: "common.shortName" },
     [ClaimsOrganizationSchemaorg.url]: { type: "string", title: "common.website", format: "uri" },
     [ClaimsServiceSchemaorg.category]: { type: "string", title: "common.sector" },
+    [ClaimsServiceSchemaorg.serviceType]: { type: "string", title: "common.networkRole" },
     [ClaimsOrganizationSchemaorg.identifierType]: { type: "string", title: "common.identifierType" },
     [ClaimsOrganizationSchemaorg.identifierValue]: { type: "string", title: "common.identifierValue" },
     [ClaimsOrganizationSchemaorg.addressCountry]: { type: "string", title: "common.jurisdiction" },
@@ -73,6 +75,7 @@ export const registrationSchemaPart1: RJSFSchema = {
     ClaimsOrganizationSchemaorg.legalName,
     ClaimsOrganizationSchemaorg.alternateName,
     ClaimsServiceSchemaorg.category,
+    ClaimsServiceSchemaorg.serviceType,
     ClaimsOrganizationSchemaorg.identifierType,
     ClaimsOrganizationSchemaorg.identifierValue,
     ClaimsOrganizationSchemaorg.addressCountry,
@@ -157,6 +160,7 @@ export const registrationUiSchemaPart1: UiSchema = {
   [ClaimsOrganizationSchemaorg.identifierType]: { "ui:widget": "select", "ui:options": { placeholder: "organization.screens.newEntity.options.legalType-placeholder" } },
   [ClaimsOrganizationSchemaorg.identifierValue]: { "ui:options": { placeholder: "organization.screens.newEntity.options.legalValue-placeholder" } },
   [ClaimsServiceSchemaorg.category]: { "ui:widget": "select", "ui:options": { placeholder: "organization.screens.newEntity.options.sector-placeholder" } },
+  [ClaimsServiceSchemaorg.serviceType]: { "ui:widget": "select", "ui:options": { placeholder: "organization.screens.newEntity.options.networkRole-placeholder" } },
   [ClaimsOrganizationSchemaorg.legalName]: { "ui:options": { placeholder: "organization.screens.newEntity.options.legalName-placeholder" } },
   [ClaimsOrganizationSchemaorg.name]: { "ui:options": { placeholder: "organization.screens.newEntity.options.commercialName-placeholder" } },
   [ClaimsOrganizationSchemaorg.streetAddress]: { "ui:options": { placeholder: "organization.screens.newEntity.options.address1-placeholder" } },

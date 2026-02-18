@@ -40,13 +40,16 @@ const ThemedPicker: React.FC<ThemedPickerProps> = ({
   ...props
 }) => {
   const textColor = useThemeColor({}, 'text');
-  const backgroundColor = useThemeColor({}, 'surface');
-  const borderColor = useThemeColor({}, 'tint');
+  const backgroundColor = useThemeColor({}, 'inputBackground');
+  const baseBorderColor = useThemeColor({}, 'inputBorder');
+  const activeBorderColor = useThemeColor({}, 'tint');
   const { accessibility, scaleFactor } = useAccessibilityContext();
   const fontSize = moderateScale(14 * scaleFactor);
+  const hasSelection = selectedValue !== undefined && selectedValue !== null && selectedValue !== '';
+  const borderColor = hasSelection ? activeBorderColor : baseBorderColor;
 
   if (Platform.OS === 'android') {
-    const pickerTextColor = accessibility.colorTheme === 'dark' ? '#000000' : textColor;
+    const pickerTextColor = textColor;
     return (
       <View style={[ { borderColor, borderWidth: 1, borderRadius: scale(8), marginBottom: scale(12), backgroundColor }, style ]}>
         <Picker

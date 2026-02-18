@@ -57,14 +57,15 @@ export default {
         dashboard: {
             title: "My Family Dashboard",
             subtitle: "Manage members, permissions, and appointments",
+            authGate: "Fetching SMART access token for this session.",
+            memberLicenses: "Available member licenses",
             description: "Overview and management of your family.",
             options: {
-                "myEntity-button-label": "My Family",
-                "myEntity-button-description": "Manage your family members, permissions, and appointments.",
-                "consents-button-label": "Consents",
-                "consents-button-description": "Manage your family's consents.",
-                "appointments-button-label": "Appointments",
-                "appointments-button-description": "Manage family appointments."
+                communications: "Communications",
+                identity: "Digital identity",
+                documents: "Documents",
+                dataSpace: "Data space",
+                account: "My account"
             },
             messages: {
                 welcome: "Welcome to your family dashboard."
@@ -89,10 +90,14 @@ export default {
         },
 
         identityMenu: {
-            title: "Identity Management",
-            subtitle: "Manage identifiers and credentials",
+            title: "Digital identity",
+            subtitle: "Identity and evidence operations",
             description: "Manage family members' identifiers and credentials.",
             options: {
+                add: "Add",
+                search: "Search",
+                evidence: "Identity evidence",
+                shareId: "Share my ID",
                 "shareId-button-label": "Share My ID / QR",
                 "shareId-button-description": "Tap to display your QR code for sharing your identifier.",
                 "linkIdentifiers-button-label": "Link individual's identifiers",
@@ -145,6 +150,10 @@ export default {
           subtitle: "Manage records and documents",
           description: "Add, view, or manage documents and sections related to this family.",
           options: {
+              index: "Index",
+              create: "Create document",
+              signature: "Signature and certification",
+              traceability: "Verification and traceability",
               "selectSubject-button-label": "Select subject / Scan ID",
               "selectSubject-button-description": "Select a person or scan their QR code.",
               "scanId-button-label": "Scan ID",
@@ -186,6 +195,28 @@ export default {
           errors: {
               deliveryFailed: "Could not deliver the communication."
           }
+      },
+      dataSpace: {
+        title: "Data space",
+        subtitle: "Organizations, services and locations",
+        options: {
+          organizations: "Participating organizations",
+          departments: "Departments / services",
+          locations: "Nearby locations",
+          myProvider: "My provider"
+        }
+      },
+      account: {
+        title: "My account",
+        subtitle: "Profile, DID and session",
+        email: "Email",
+        role: "Role",
+        did: "My DID",
+        providerDid: "Provider DID",
+        token: "Token available",
+        tasksHistory: "Tasks history",
+        jobs: "My jobs",
+        logout: "Sign out"
       },
       connections: {
         'Family Health': 'Family Health',

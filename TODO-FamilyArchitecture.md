@@ -3,7 +3,7 @@
 
 // 1. Create `FamilyAdminService.ts` in `client-sdk-ts/src/services/family-admin/`
 //    - It should contain a `createFamily(founderData: object)` method.
-//    - This method will be analogous to `OrgAdminService.createOrganization`.
+//    - This method will be analogous to `OrgAdminService.startOrganizationRegistration`.
 //    - It will target a HOST provider endpoint in the `registry` section.
 
 // 2. Implement the UI Flow in the Application (e.g., in App.js or a dedicated screen)

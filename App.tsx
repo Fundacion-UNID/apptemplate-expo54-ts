@@ -2,7 +2,7 @@
 // Copyright 2026 Conéctate Soluciones y Aplicaciones SL under the Apache License, Version 2.0.
 
 // This line ensures Firebase is initialized before any other part of the app.
-import './utils/firebase-config.ts';
+import './utils/firebase-config';
 
 // See docs/context-providers.md for a detailed explanation of the provider stack.
 import { I18nextProvider } from 'react-i18next';
@@ -15,6 +15,7 @@ import { SubjectProvider } from './context/SubjectContext';
 import { JobProvider } from './context/JobContext';
 import { DirectoryProvider } from './context/DirectoryContext';
 import { AuthorizationProvider } from './context/AuthorizationContext';
+import { EntitlementProvider } from './context/EntitlementContext';
 
 export default function App() {
     return (
@@ -26,7 +27,9 @@ export default function App() {
                             <JobProvider>
                                 <SubjectProvider>
                                     <I18nextProvider i18n={i18n}>
-                                        <RootNavigator />
+                                        <EntitlementProvider>
+                                            <RootNavigator />
+                                        </EntitlementProvider>
                                     </I18nextProvider>
                                 </SubjectProvider>
                             </JobProvider>

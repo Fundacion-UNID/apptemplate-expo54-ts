@@ -14,13 +14,10 @@ This guide explains how to bootstrap a clean **Expo SDK 54** project using **Jav
 
 ## 🧩 0.5. Project-specific notes (this repo)
 
-- This app uses local workspace packages via `file:` deps: `../gdc-sdk-client-ts` and `../gdc-common-utils-ts`.
-- Run `npm i` in both local packages (or set up workspaces) so their dependencies are installed.
+- This app uses published npm packages: `gdc-sdk-client-ts` and `gdc-common-utils-ts`.
+- Install them with `npx expo install gdc-sdk-client-ts gdc-common-utils-ts`.
 - Crypto/encoding libs like `base-x`, `@noble/*`, `@stablelib/*`, and `pako` live in `gdc-common-utils-ts`.
 - UI helpers already listed in this app’s `package.json` include `react-native-country-codes-picker`, `react-native-country-flag`, `react-native-gifted-chat`, and `react-i18next`. You only need `npm i` here, not repeated `expo install`.
-- To avoid Metro missing local package dependencies, use:
-  - `npm run install:local-deps` (reads local `file:` packages and installs their deps in this app)
-  - `npm run uninstall:local-deps` (removes only the deps installed by the script)
 
 ---
 
@@ -125,7 +122,7 @@ JS-only packages (clean app):
 npm i uuid base-x pako @noble/hashes @noble/post-quantum @stablelib/utf8 @stablelib/base64
 ```
 
-In this repo, these live under `../gdc-common-utils-ts/package.json`. Only install them in the app if you import them directly from the app code.
+In this repo, these live under `gdc-common-utils-ts`'s `package.json`. Only install them in the app if you import them directly from the app code.
 
 If you use `uuid` in React Native, ensure you import the polyfill once (e.g. in `index.js`):
 

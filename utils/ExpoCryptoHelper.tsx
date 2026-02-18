@@ -4,7 +4,7 @@ import { ICryptoHelper } from 'gdc-common-utils-ts/interfaces/ICryptoHelper';
 
 /**
  * @class ExpoCryptoHelper
- * An adapter that implements the ICryptoHelper interface from the crypto-ts library
+ * An adapter that implements the ICryptoHelper interface from the gdc-common-utils-ts library
  * using Expo's native crypto primitives. This class acts as a bridge between the
  * platform-agnostic core cryptography service and the Expo runtime.
  */

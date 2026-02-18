@@ -3,7 +3,7 @@
 
 import React, { useState } from 'react';
 import { View, Modal, StyleSheet, FlatList, Alert } from 'react-native';
-import { ClaimsConsent, ClaimsContextFhirConsent } from 'gdc-sdk-client-ts/src/models/claims';
+import { ClaimsConsent, ClaimsContextFhirConsent } from 'gdc-sdk-client-ts';
 import ThemedButton from './ThemedButton';
 import ThemedText from './ThemedText';
 import ThemedTextInput from './ThemedTextInput';

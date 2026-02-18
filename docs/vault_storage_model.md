@@ -62,7 +62,7 @@ Use an **Attribute-Value index table**.
 
 **`indexed_attributes`** (one-to-many):
 - `container_id` (FK → `containers.id`)
-- `name` (string)
+- `name` (string) – HMAC-protected value
 - `value` (string) – HMAC-protected value
 - `type` (string)
 - `unique_flag` (boolean)
