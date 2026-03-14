@@ -14,8 +14,9 @@ const config = getDefaultConfig(projectRoot, {
 });
 
 // Add '.db' to the list of asset extensions.
-// This is a custom configuration for this project to handle SQLite database files.
+// This project needs SQLite database files and the wasm payload used by expo-sqlite on web.
 config.resolver.assetExts.push('db');
+config.resolver.assetExts.push('wasm');
 
 // Prefer the app's node_modules to avoid workspace lookups.
 config.resolver.nodeModulesPaths = [path.resolve(projectRoot, 'node_modules')];

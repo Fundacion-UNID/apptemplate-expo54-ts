@@ -30,7 +30,7 @@ const resources = {
 };
 
 const detectDefaultLanguage = () => {
-    const locale = Localization.getLocales?.()[0]?.languageTag || Localization.locale;
+    const locale = Localization.getLocales?.()[0]?.languageTag;
     if (locale) {
         return locale.toLowerCase().startsWith('es') ? 'es' : 'en';
     }

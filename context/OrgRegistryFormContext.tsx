@@ -4,9 +4,24 @@ import { OrgRegistrationForm } from '../forms/organization-registry-RJSF';
 
 // --- Type Definitions ---
 
+export interface OrgIcaVerificationState {
+  thid?: string;
+  verifyResponse?: any;
+  organizationCredential?: any;
+  legalRepresentativeCredential?: any;
+  organizationInfo?: any;
+  legalRepresentativeInfo?: any;
+  organizationDidDocumentThid?: string;
+  organizationDidDocumentResponse?: any;
+  organizationDidDocument?: any;
+  errorMessage?: string;
+}
+
 interface OrgRegistryFormContextValue {
   formData: Partial<OrgRegistrationForm>;
   setFormData: React.Dispatch<React.SetStateAction<Partial<OrgRegistrationForm>>>;
+  icaVerification: OrgIcaVerificationState | null;
+  setIcaVerification: React.Dispatch<React.SetStateAction<OrgIcaVerificationState | null>>;
 }
 
 // --- Context Creation ---
@@ -20,7 +35,11 @@ const OrgRegistryFormContext = createContext<OrgRegistryFormContextValue | undef
  */
 export const OrgRegistryFormProvider = ({ children }: { children: ReactNode }) => {
   const [formData, setFormData] = useState<Partial<OrgRegistrationForm>>({});
-  const value = useMemo(() => ({ formData, setFormData }), [formData]);
+  const [icaVerification, setIcaVerification] = useState<OrgIcaVerificationState | null>(null);
+  const value = useMemo(
+    () => ({ formData, setFormData, icaVerification, setIcaVerification }),
+    [formData, icaVerification]
+  );
 
   return (
     <OrgRegistryFormContext.Provider value={value}>
@@ -41,4 +60,3 @@ export const useOrgRegistryForm = () => {
   }
   return context;
 };
-

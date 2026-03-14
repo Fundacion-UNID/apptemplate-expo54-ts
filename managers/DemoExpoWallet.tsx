@@ -46,6 +46,17 @@ export class DemoExpoWallet implements IWallet {
   }
 
   async provisionKeys(entityId: string): Promise<JwkSet> {
+    const existingKeys = this._managedKeys.get(entityId);
+    if (existingKeys?.verificationKeyPair?.publicJWKey && existingKeys?.encryptionKeyPair?.publicJWKey) {
+      console.log(`[DemoExpoWallet] Reusing existing keys for entity: ${entityId}`);
+      return {
+        keys: [
+          existingKeys.verificationKeyPair.publicJWKey as JWK,
+          existingKeys.encryptionKeyPair.publicJWKey as JWK,
+        ],
+      };
+    }
+
     console.log(`[DemoExpoWallet] Provisioning new keys for entity: ${entityId}`);
     
     const dsaSeedString = await this.digest(entityId + '-dsa', CryptoDigestAlgorithm.SHA256);

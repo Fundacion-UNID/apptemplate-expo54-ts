@@ -29,6 +29,7 @@ import { getBaseUrlFromDidWeb } from 'gdc-common-utils-ts/utils/did';
 import { MldsaPublicJwk, MlkemPublicJwk } from 'gdc-common-utils-ts/interfaces/Cryptography.types';
 import { deriveProfileId } from '../../utils/profileId';
 import { buildDidFromProviderUrl, buildHostedDid, buildSelfHostedDid, normalizeUrl } from '../../utils/providerDid';
+import { buildIcaAutofillData } from '../../utils/orgRegistrationIca';
 import {
   cancelPendingJobsByThid,
   detectRouteNotFoundForThid,
@@ -51,7 +52,7 @@ export default function OrgNewEntityScreen({ navigation }: Props) {
   const { t } = useTranslation();
   const { scaleFactor } = useAccessibilityContext();
   const styles = getScreenStyles(scaleFactor);
-  const { formData, setFormData } = useOrgRegistryForm();
+  const { formData, icaVerification, setFormData } = useOrgRegistryForm();
   const { initializeSession, isLoading: isProfileLoading, operationMode, sdk } = useProfile();
   const { accessToken: idToken } = useSubject();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -84,6 +85,14 @@ export default function OrgNewEntityScreen({ navigation }: Props) {
   });
 
   const selectedSector = String(localData[ClaimsServiceSchemaorg.category] || '').trim().toLowerCase();
+  const icaAutofillData = useMemo(
+    () => (icaVerification ? buildIcaAutofillData(icaVerification) : {}),
+    [icaVerification]
+  );
+  const icaLockedFields = useMemo(
+    () => new Set(Object.keys(icaAutofillData) as Array<keyof OrgRegistrationForm>),
+    [icaAutofillData]
+  );
   const providersForSelectedSector = useMemo(
     () => getServiceProvidersForSector(selectedSector),
     [selectedSector]
@@ -93,13 +102,14 @@ export default function OrgNewEntityScreen({ navigation }: Props) {
     if (!providersForSelectedSector.length) return;
     const selectedProvider = String(localData[ClaimsServiceSchemaorg.url] || '');
     const hasSelectedProvider = providersForSelectedSector.some((provider) => provider.url === selectedProvider);
-    if (!hasSelectedProvider) {
+    const isProviderLocked = icaLockedFields.has(ClaimsServiceSchemaorg.url);
+    if (!selectedProvider || (!isProviderLocked && !hasSelectedProvider)) {
       setLocalData((prev) => ({
         ...prev,
         [ClaimsServiceSchemaorg.url]: providersForSelectedSector[0].url,
       }));
     }
-  }, [localData[ClaimsServiceSchemaorg.url], providersForSelectedSector]);
+  }, [icaLockedFields, localData, providersForSelectedSector]);
 
   const updateField = (field: keyof OrgRegistrationForm, value: any) => {
     setLocalData(prev => ({ ...prev, [field]: value }));
@@ -316,6 +326,7 @@ export default function OrgNewEntityScreen({ navigation }: Props) {
 
             const uiSchema = registrationUiSchemaPart1[typedKey] || {};
             const placeholder = uiSchema['ui:options']?.placeholder || '';
+            const isLockedByIca = icaLockedFields.has(typedKey);
             
             let fieldComponent;
             
@@ -342,16 +353,40 @@ export default function OrgNewEntityScreen({ navigation }: Props) {
                   ];
                 }
                 
-                fieldComponent = <ThemedPicker selectedValue={localData[typedKey]} onValueChange={(v: any) => updateField(typedKey, v)} items={pickerOptions} accessibilityLabel={t(fieldSchema.title)} />;
+                fieldComponent = (
+                  <ThemedPicker
+                    selectedValue={localData[typedKey]}
+                    onValueChange={(v: any) => updateField(typedKey, v)}
+                    items={pickerOptions}
+                    accessibilityLabel={t(fieldSchema.title)}
+                    disabled={isLockedByIca}
+                  />
+                );
                 break;
 
               default:
-                fieldComponent = <ThemedInput placeholder={t(placeholder)} value={localData[typedKey] ? String(localData[typedKey]) : ''} onChangeText={(v: any) => updateField(typedKey, v)} accessibilityLabel={t(fieldSchema.title)} style={{}} />;
+                fieldComponent = (
+                  <ThemedInput
+                    placeholder={t(placeholder)}
+                    value={localData[typedKey] ? String(localData[typedKey]) : ''}
+                    onChangeText={(v: any) => updateField(typedKey, v)}
+                    accessibilityLabel={t(fieldSchema.title)}
+                    disabled={isLockedByIca}
+                    style={{}}
+                  />
+                );
                 break;
             }
 
             if (typedKey === ClaimsOrganizationSchemaorg.addressCountry) {
-              fieldComponent = <CountrySelector value={localData[typedKey]} onChange={(v: any) => updateField(typedKey, v)} placeholder={t(placeholder)} />;
+              fieldComponent = (
+                <CountrySelector
+                  value={localData[typedKey]}
+                  onChange={(v: any) => updateField(typedKey, v)}
+                  placeholder={t(placeholder)}
+                  disabled={isLockedByIca}
+                />
+              );
             }
 
             return (
@@ -372,12 +407,21 @@ export default function OrgNewEntityScreen({ navigation }: Props) {
             <ThemedText style={[styles.formLabel, { textAlign: 'left' }]}>
               {t('organization.screens.newEntity.provider-label')}
             </ThemedText>
-            <ThemedPicker 
-              selectedValue={localData[ClaimsServiceSchemaorg.url]} 
-              onValueChange={(v: any) => updateField(ClaimsServiceSchemaorg.url, v)} 
-              items={providersForSelectedSector.map((provider) => ({ label: provider.name, value: provider.url }))} 
-              accessibilityLabel={t('organization.screens.newEntity.provider-label')}
-            />
+            {icaLockedFields.has(ClaimsServiceSchemaorg.url) ? (
+              <ThemedInput
+                value={localData[ClaimsServiceSchemaorg.url] ? String(localData[ClaimsServiceSchemaorg.url]) : ''}
+                accessibilityLabel={t('organization.screens.newEntity.provider-label')}
+                disabled
+                style={{}}
+              />
+            ) : (
+              <ThemedPicker 
+                selectedValue={localData[ClaimsServiceSchemaorg.url]} 
+                onValueChange={(v: any) => updateField(ClaimsServiceSchemaorg.url, v)} 
+                items={providersForSelectedSector.map((provider) => ({ label: provider.name, value: provider.url }))} 
+                accessibilityLabel={t('organization.screens.newEntity.provider-label')}
+              />
+            )}
             <ThemedText style={{ opacity: 0.7, marginTop: 4 }}>
               {t('organization.screens.newEntity.options.provider-help')}
             </ThemedText>

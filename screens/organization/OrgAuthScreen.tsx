@@ -1,8 +1,8 @@
 // screens/organization/OrgAuthScreen.tsx
 // Copyright 2026 Conéctate Soluciones y Aplicaciones SL under the Apache License, Version 2.0.
 
-import React from 'react';
-import { ScrollView } from 'react-native';
+import React, { useEffect } from 'react';
+import { Platform, ScrollView } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useAccessibilityContext } from '../../context/AccessibilityContext';
 import AccessibleButtonGrid, { ButtonItem } from '../../components/AccessibleButtonGrid';
@@ -10,6 +10,7 @@ import ScreenHeader from '../../components/ScreenHeader';
 import { getScreenStyles } from '../../constants/Styles';
 import { Routes } from '../../constants/Routes';
 import { useThemeColor } from '../../hooks/useThemeColor';
+import { runIcaReadmeConsoleDemo } from '../../utils/icaReadmeDemo';
 
 // Define a basic type for the navigation prop for this screen.
 // For a more robust solution, a centralized navigation type definition would be ideal.
@@ -28,6 +29,12 @@ const OrgAuthScreen: React.FC<OrgAuthScreenProps> = ({ navigation }) => {
     const { scaleFactor } = useAccessibilityContext();
     const backgroundColor = useThemeColor({}, 'background');
     const styles = getScreenStyles(scaleFactor);
+
+    useEffect(() => {
+        if (__DEV__ && Platform.OS === 'web') {
+            void runIcaReadmeConsoleDemo();
+        }
+    }, []);
 
     // Define auth buttons with the AuthButton type.
     const buttons: ButtonItem[] = [

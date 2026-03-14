@@ -64,6 +64,17 @@ export class ExpoWallet implements IWallet {
    * @returns A promise that resolves to the public parts of the generated keys.
    */
   async provisionKeys(entityId: string): Promise<JwkSet> {
+    const existingKeys = this._managedKeys.get(entityId);
+    if (existingKeys?.verificationKeyPair?.publicJWKey && existingKeys?.encryptionKeyPair?.publicJWKey) {
+      console.log(`[ExpoWallet] Reusing existing keys for entity: ${entityId}`);
+      return {
+        keys: [
+          existingKeys.verificationKeyPair.publicJWKey as JWK,
+          existingKeys.encryptionKeyPair.publicJWKey as JWK,
+        ],
+      };
+    }
+
     console.log(`[ExpoWallet] (PRODUCTION) Provisioning REAL keys for entity: ${entityId}`);
 
     let dsaSeed: Uint8Array;

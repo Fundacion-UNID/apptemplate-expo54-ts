@@ -20,6 +20,15 @@ type ThemedButtonProps = PressableProps & {
   titleStyle?: StyleProp<TextStyle>;
 };
 
+const toGradientTuple = (
+  colors: readonly string[] | undefined,
+  fallbackStart: string,
+  fallbackEnd: string
+): readonly [string, string] => {
+  const [start = fallbackStart, end = fallbackEnd] = colors || [];
+  return [start, end];
+};
+
 export default function ThemedButton({
   title,
   onPress,
@@ -59,10 +68,18 @@ export default function ThemedButton({
   );
 
   const useGradient = theme === 'dark' && !isDisabled && type !== 'outline';
-  const gradientColors =
+  const gradientColors: readonly [string, string] =
     type === 'secondary'
-      ? Colors.dark.buttonSecondaryGradient ?? [Colors.dark.buttonSecondaryBackground, Colors.dark.secondary]
-      : Colors.dark.buttonPrimaryGradient ?? [Colors.dark.buttonPrimaryBackground, Colors.dark.primary];
+      ? toGradientTuple(
+          Colors.dark.buttonSecondaryGradient,
+          Colors.dark.buttonSecondaryBackground,
+          Colors.dark.secondary
+        )
+      : toGradientTuple(
+          Colors.dark.buttonPrimaryGradient,
+          Colors.dark.buttonPrimaryBackground,
+          Colors.dark.primary
+        );
 
   return (
     <Pressable
